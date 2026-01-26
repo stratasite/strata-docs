@@ -1,3 +1,61 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Installation
 
-Installation instructions will be added here.
+Before you can start using Strata CLI, you need to install it on your system. This guide will walk you through the installation process.
+
+## Requirements
+
+Before installing Strata CLI, ensure you have the following prerequisites installed:
+
+- **[Ruby](https://www.ruby-lang.org/en/downloads/)**: 3.4.4 or higher
+- **[Git](https://git-scm.com/downloads)**: 2.7.0 or higher (required for deployment features)
+
+## Install Strata CLI
+
+This installs Strata CLI globally on your system, so you can run `strata` commands from any directory.
+
+<Tabs>
+  <TabItem value="gem" label="Gem" default>
+    ```bash
+    gem install strata-cli
+    ```
+  </TabItem>
+  <TabItem value="script" label="Shell Script">
+    ```bash
+    # Shell script installation coming soon
+    # This method will allow installation without RubyGems
+    ```
+  </TabItem>
+</Tabs>
+
+## Verify Installation
+
+After installation, verify that Strata CLI is installed correctly:
+
+```bash
+strata version
+```
+
+This command displays the installed version of Strata CLI.
+
+## Getting Help
+
+To see all available commands, run:
+
+```bash
+strata
+```
+
+For detailed help on any command, use:
+
+```bash
+strata COMMAND --help
+```
+
+The CLI help system provides comprehensive documentation for each command, including options, examples, and usage patterns.
+
+## Next Steps
+
+Now that you have Strata CLI installed, you're ready to start creating your first Strata project!

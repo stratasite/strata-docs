@@ -47,9 +47,6 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Update this to your repository URL
-          editUrl:
-            'https://github.com/your-username/strata-docs/tree/main/',
           routeBasePath: 'docs',
         },
         blog: false,
