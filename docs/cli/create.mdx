@@ -38,6 +38,8 @@ strata create table contact/dse.call_center_d
 **Interactive mode:**
 If no TABLE_PATH provided, prompts to search and select a table.
 
+[Tables](/docs/semantic-model/tables) - What a table is in the semantic model and how to define fields, dimensions, and measures.
+
 ### relation RELATION_PATH
 
 Create a relationship (join) definition file.
@@ -57,6 +59,8 @@ strata create relation sales/orders
 strata create relation sales/orders
 # Creates: models/sales/rel.orders.yml
 ```
+
+[Relationships](/docs/semantic-model/relationships/cardinality) - Cardinality, join types, and many-to-many workarounds.
 
 ### migration rename
 
@@ -174,6 +178,6 @@ When creating tables:
 
 ## Next Steps
 
-- [Edit generated files](/docs/guides/creating-tables)
-- [Define relationships](/docs/guides/relationships)
-- [Create migrations](/docs/guides/migrations)
+- [creating-tables](/docs/guides/creating-tables) - Edit and refine generated table models
+- [relationships](/docs/guides/relationships) - Define relationships between tables
+- [migrations](/docs/guides/migrations) - Run and manage migrations

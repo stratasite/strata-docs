@@ -135,6 +135,10 @@ strata datasource exec warehouse -q "SELECT * FROM orders LIMIT 10"
 - `-q, --query QUERY` - Inline SQL query
 - `-f, --file PATH` - SQL query from file
 
+## Tier Configuration
+
+When adding or editing a datasource, you can set a **tier** (`hot`, `warm`, or `cold`). Tiers influence query routing and performance. For a full explanation of what each tier means and when to use it, see [Datasources](/docs/semantic-model/datasources#tier-configuration).
+
 ## Examples
 
 ### Add PostgreSQL Datasource
@@ -205,6 +209,6 @@ warehouse:
 
 ## Next Steps
 
-- [Create tables](/docs/reference/cli/create#table)
-- [Test connections](/docs/reference/cli/datasource#test)
-- [Read adapter documentation](/docs/reference/adapters)
+- [Create tables](/docs/cli/create#table) - Use `strata create table` after adding a datasource
+- [Datasources (tiers, full config)](/docs/semantic-model/datasources)
+- [Adapters](/docs/cli/adapters) - Adapter-specific configuration

@@ -17,6 +17,34 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'CLI',
+      items: [
+        'cli/index',
+        'cli/datasource',
+        'cli/init',
+        'cli/create',
+        'cli/table',
+        'cli/deploy',
+        'cli/audit',
+        {
+          type: 'category',
+          label: 'Adapters',
+          items: [
+            'cli/adapters/index',
+            'cli/adapters/postgres',
+            'cli/adapters/snowflake',
+            'cli/adapters/mysql',
+            'cli/adapters/sqlserver',
+            'cli/adapters/athena',
+            'cli/adapters/trino',
+            'cli/adapters/duckdb',
+            'cli/adapters/druid',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Guides',
       items: [
         'guides/index',
@@ -24,7 +52,6 @@ const sidebars: SidebarsConfig = {
         'guides/fields-and-types',
         'guides/expressions',
         'guides/relationships',
-        'guides/datasources',
         'guides/migrations',
         'guides/testing',
         'guides/deployment',
@@ -36,13 +63,30 @@ const sidebars: SidebarsConfig = {
       label: 'Semantic Model',
       items: [
         'semantic-model/index',
+        'semantic-model/datasources',
         'semantic-model/tables',
         {
           type: 'category',
           label: 'Fields',
           items: [
-            'semantic-model/fields/dimensions',
-            'semantic-model/fields/measures',
+            'semantic-model/fields/index',
+            {
+              type: 'category',
+              label: 'Dimensions',
+              items: [
+                'semantic-model/fields/dimensions/index',
+                'semantic-model/fields/dimensions/date-time',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Measures',
+              items: [
+                'semantic-model/fields/measures/index',
+                'semantic-model/fields/measures/compound',
+                'semantic-model/fields/measures/snapshot',
+              ],
+            },
             'semantic-model/fields/data-types',
             'semantic-model/fields/formatters',
           ],
@@ -54,6 +98,7 @@ const sidebars: SidebarsConfig = {
             'semantic-model/expressions/sql',
             'semantic-model/expressions/lookups',
             'semantic-model/expressions/arrays',
+            'semantic-model/expressions/extended-blending',
           ],
         },
         {
@@ -72,7 +117,7 @@ const sidebars: SidebarsConfig = {
       label: 'Advanced',
       items: [
         'advanced/index',
-        'advanced/snapshot-measures',
+        'advanced/extended-blending-groups',
         'advanced/exclusions',
         'advanced/inclusions',
         'advanced/partitions',
@@ -87,52 +132,6 @@ const sidebars: SidebarsConfig = {
           ],
         },
         'advanced/multi-datasource',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Reference',
-      items: [
-        {
-          type: 'category',
-          label: 'CLI',
-          items: [
-            'reference/cli/index',
-            'reference/cli/init',
-            'reference/cli/datasource',
-            'reference/cli/create',
-            'reference/cli/deploy',
-            'reference/cli/audit',
-            'reference/cli/table',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Schema',
-          items: [
-            'reference/schema/project',
-            'reference/schema/datasources',
-            'reference/schema/table',
-            'reference/schema/relation',
-            'reference/schema/migration',
-            'reference/schema/test',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Adapters',
-          items: [
-            'reference/adapters/index',
-            'reference/adapters/postgres',
-            'reference/adapters/snowflake',
-            'reference/adapters/mysql',
-            'reference/adapters/sqlserver',
-            'reference/adapters/athena',
-            'reference/adapters/trino',
-            'reference/adapters/duckdb',
-            'reference/adapters/druid',
-          ],
-        },
       ],
     },
     {

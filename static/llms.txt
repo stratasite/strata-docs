@@ -15,7 +15,7 @@ Strata is a semantic layer platform that transforms raw database tables into bus
 - [Fields and Types](/docs/guides/fields-and-types): Dimensions, measures, data types
 - [Expressions](/docs/guides/expressions): SQL expressions, lookups, primary keys
 - [Relationships](/docs/guides/relationships): Configure joins between tables
-- [Datasources](/docs/guides/datasources): Configure database connections
+- [Datasources](/docs/semantic-model/datasources): Configure database connections and tiers
 - [Migrations](/docs/guides/migrations): Rename and swap operations
 - [Testing](/docs/guides/testing): Validate your semantic model
 - [Deployment](/docs/guides/deployment): Deploy to Strata server
@@ -31,7 +31,7 @@ Strata is a semantic layer platform that transforms raw database tables into bus
 - [Relationships](/docs/semantic-model/relationships/cardinality): Join cardinality
 
 ## Advanced Features
-- [Snapshot Measures](/docs/advanced/snapshot-measures): Beginning/ending snapshots
+- [Snapshot Measures](/docs/semantic-model/fields/measures/snapshot): Beginning/ending snapshots
 - [Exclusions](/docs/advanced/exclusions): Measure exclusions
 - [Inclusions](/docs/advanced/inclusions): Multi-level calculations
 - [Partitions](/docs/advanced/partitions): Date partitioning
@@ -41,9 +41,9 @@ Strata is a semantic layer platform that transforms raw database tables into bus
 - [Multi-Datasource](/docs/advanced/multi-datasource): Cross-datasource queries
 
 ## Reference
-- [CLI Commands](/docs/reference/cli): Complete command reference
-- [Schema Reference](/docs/reference/schema): YAML schema definitions
-- [Adapters](/docs/reference/adapters): Database adapter configurations
+- [CLI Commands](/docs/cli): Complete command reference
+- [Tables](/docs/semantic-model/tables) and [Relationships](/docs/semantic-model/relationships/cardinality): Model structure
+- [Adapters](/docs/cli/adapters): Database adapter configurations
 
 ## Examples
 - [TPC-DS Tutorial](/docs/examples/tpcds-tutorial): Full walkthrough

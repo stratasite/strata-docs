@@ -1,0 +1,162 @@
+# Datasources
+
+Configure database connections and understand tier behavior.
+
+## What are Datasources?
+
+Datasources connect Strata to your databases. They define:
+- Database adapter (PostgreSQL, Snowflake, MySQL, etc.)
+- Connection details (host, port, database, schema)
+- Authentication credentials
+- **Tier** (hot, warm, cold) — influences query routing and performance
+
+For CLI commands to add, test, and manage datasources, see [datasource](/docs/cli/datasource).
+
+## Tier Configuration
+
+Strata supports three tiers. They control which datasource is preferred when the same data or compatible tables exist in more than one place, and how query cost is estimated.
+
+### hot
+
+Primary datasource for fast, frequently accessed data. Highest priority for query routing.
+
+Use for:
+- Primary data warehouse
+- Main OLAP or analytics database
+- Data that must respond quickly
+
+```yaml
+warehouse:
+  adapter: postgres
+  tier: hot
+  # ... connection details
+```
+
+### warm
+
+Secondary datasource for less frequently accessed or moderately slower data. Used when a hot-tier source is unavailable or when the planner chooses it for cost or availability.
+
+Use for:
+- Replicas or read replicas
+- Archived but still reasonably fast data
+- Secondary databases
+
+```yaml
+archive:
+  adapter: postgres
+  tier: warm
+  # ... connection details
+```
+
+### cold
+
+Archive or slow-access data. Used as a last resort when hot or warm tiers cannot satisfy the query.
+
+Use for:
+- S3/Athena or object-store–backed query engines
+- Historical or infrequently queried data
+- Data lakes with higher latency
+
+```yaml
+historical:
+  adapter: athena
+  tier: cold
+  # ... connection details
+```
+
+## Adding a Datasource
+
+### Via CLI
+
+```bash
+strata datasource add [ADAPTER]
+```
+
+Examples: `strata datasource add postgres`, `strata datasource add snowflake`, `strata datasource add mysql`.
+
+The CLI prompts for: datasource key, display name, adapter-specific settings, credentials, and tier.
+
+### Manual Configuration
+
+Edit `datasources.yml`:
+
+```yaml
+warehouse:
+  adapter: postgres
+  name: Production Warehouse
+  description: Main data warehouse
+  tier: hot
+  query_timeout: 3600
+  host: warehouse.example.com
+  port: 5432
+  database: analytics
+  schema: public
+  ssl: true
+  username: strata_user
+  # password: (set via strata datasource auth)
+```
+
+## Setting Credentials
+
+Credentials are stored in `.strata` (gitignored):
+
+```bash
+strata datasource auth warehouse
+```
+
+Remote credentials (on server):
+
+```bash
+strata datasource auth warehouse --remote
+```
+
+## Testing Connections
+
+```bash
+strata datasource test warehouse
+```
+
+Verifies connection parameters, authentication, and database accessibility.
+
+## Supported Adapters
+
+1. **PostgreSQL** — [postgres](/docs/cli/adapters/postgres)
+2. **Snowflake** — [snowflake](/docs/cli/adapters/snowflake)
+3. **MySQL** — [mysql](/docs/cli/adapters/mysql)
+4. **SQL Server** — [sqlserver](/docs/cli/adapters/sqlserver)
+5. **Athena** — [athena](/docs/cli/adapters/athena)
+6. **Trino** — [trino](/docs/cli/adapters/trino)
+7. **DuckDB** — [duckdb](/docs/cli/adapters/duckdb)
+8. **Druid** — [druid](/docs/cli/adapters/druid)
+
+## Query Timeout
+
+```yaml
+warehouse:
+  adapter: postgres
+  query_timeout: 3600  # seconds (1 hour)
+  # ... connection details
+```
+
+## Best Practices
+
+1. **Use descriptive keys** — e.g. `warehouse`, not `db1`
+2. **Set tiers to match performance** — hot for primary, cold for S3/Athena-style sources
+3. **Store credentials in `.strata`** — never commit them
+4. **Test connections** — run `strata datasource test` before deploy
+5. **Set timeouts** — avoid unbounded long-running queries
+6. **Use SSL in production**
+
+## Security
+
+- Credentials in `.strata` (gitignored)
+- File permissions 0600 (owner only)
+- API keys not accepted on the command line
+- Remote credentials stored encrypted on the server
+
+## Next Steps
+
+- [datasource](/docs/cli/datasource) — CLI commands
+- [Adapters](/docs/cli/adapters) — Adapter-specific configuration
+- [multi-datasource](/docs/advanced/multi-datasource) — Cross-datasource queries
+- [cost-optimization](/docs/advanced/cost-optimization)

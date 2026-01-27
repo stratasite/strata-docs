@@ -2,6 +2,10 @@
 
 Understand relationship cardinality types.
 
+:::danger Many-to-Many Not Supported
+Strata does not support `many_to_many` relationships. Use junction/bridge tables with two separate relationships (`one_to_many` and `many_to_one`) instead.
+:::
+
 ## Overview
 
 Cardinality defines the relationship type between two tables. It tells the planner how rows in one table relate to rows in another.
@@ -132,6 +136,5 @@ customer_orders:
 
 ## Next Steps
 
-- Learn about [join types](/docs/semantic-model/relationships/join-types)
-- Read the [relationships guide](/docs/guides/relationships)
-- Explore [relationship schema reference](/docs/reference/schema/relation)
+- [Join types](/docs/semantic-model/relationships/join-types)
+- [Relationships guide](/docs/guides/relationships)

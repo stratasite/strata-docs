@@ -44,11 +44,13 @@ description: Full name of the customer
 
 ### data_type
 
-The data type of the dimension. See [data types reference](/docs/semantic-model/fields/data-types).
+The data type of the dimension. See [data types](/docs/semantic-model/fields/data-types).
 
 ```yaml
 data_type: string
 ```
+
+For **date and date_time** dimensions, including grains and filtering patterns, see [Date and DateTime dimensions](/docs/semantic-model/fields/dimensions/date-time).
 
 ### expression
 
@@ -111,22 +113,9 @@ Limit the number of values shown in filters (default: 1000).
 value_list_size: 500
 ```
 
-### grains
+### extended_blend_group
 
-For date/date_time dimensions, specify supported granularities.
-
-```yaml
-grains:
-  - day
-  - week
-  - month
-  - quarter
-  - year
-```
-
-Available grains: `raw`, `second`, `minute`, `hour`, `day`, `week`, `month`, `quarter`, `year`
-
-[Learn about date grains →](/docs/semantic-model/fields/data-types#date-and-datetime)
+For dimensions that should blend across tables in queries, set the same `extended_blend_group` on each. See [Extended blending](/docs/semantic-model/expressions/extended-blending) and [Extended blending groups](/docs/advanced/extended-blending-groups).
 
 ## Primary Keys
 
@@ -156,23 +145,6 @@ Mark dimensions as primary keys for query optimization:
   data_type: string
   expression:
     sql: category_name
-```
-
-### Date Dimension
-
-```yaml
-- type: dimension
-  name: Order Date
-  description: Date when order was placed
-  data_type: date
-  grains:
-    - day
-    - week
-    - month
-    - quarter
-    - year
-  expression:
-    sql: order_date
 ```
 
 ### High-Cardinality Dimension
@@ -213,13 +185,14 @@ Mark dimensions as primary keys for query optimization:
 1. **Use descriptive names** - Business-friendly dimension names
 2. **Add descriptions** - Help users understand dimensions
 3. **Disable value listing** for high-cardinality dimensions (IDs, timestamps)
-4. **Set grains for dates** - Enable flexible date grouping
+4. **Set grains for date/datetime** - See [Date and DateTime dimensions](/docs/semantic-model/fields/dimensions/date-time)
 5. **Mark primary keys** - Improve query optimization
 6. **Use appropriate data types** - Match database column types
 
 ## Next Steps
 
-- Learn about [measures](/docs/semantic-model/fields/measures)
-- Explore [data types](/docs/semantic-model/fields/data-types)
-- Understand [formatters](/docs/semantic-model/fields/formatters)
-- Read about [expressions](/docs/semantic-model/expressions/sql)
+- [Date and DateTime dimensions](/docs/semantic-model/fields/dimensions/date-time) - Grains, formatting, and date-specific patterns
+- [Measures](/docs/semantic-model/fields/measures)
+- [Data types](/docs/semantic-model/fields/data-types)
+- [Formatters](/docs/semantic-model/fields/formatters)
+- [Expressions](/docs/semantic-model/expressions/sql)

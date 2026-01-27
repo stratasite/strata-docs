@@ -1,0 +1,82 @@
+# CLI
+
+Complete reference for Strata CLI commands.
+
+## Overview
+
+The Strata CLI provides commands for managing semantic models, datasources, and deployments. Commands follow: `strata [COMMAND] [SUBCOMMAND] [OPTIONS]`
+
+## Commands
+
+### Datasource Management
+
+| Command | Description | Read more |
+|---------|-------------|-----------|
+| **datasource** | Add, list, auth, test, tables, meta, exec | [datasource](/docs/cli/datasource) |
+| `strata datasource add` | Add a new datasource | [datasource](/docs/cli/datasource#add-adapter) |
+| `strata datasource list` | List configured datasources | [datasource](/docs/cli/datasource#list) |
+| `strata datasource auth` | Set credentials | [datasource](/docs/cli/datasource#auth-ds_key) |
+| `strata datasource test` | Test connection | [datasource](/docs/cli/datasource#test-ds_key) |
+| `strata datasource tables` | List tables in a datasource | [datasource](/docs/cli/datasource#tables-ds_key) |
+
+For datasource configuration, tiers (hot/warm/cold), and YAML structure, see [Datasources](/docs/semantic-model/datasources).
+
+### Project Management
+
+| Command | Description | Read more |
+|---------|-------------|-----------|
+| **init** | Initialize a new Strata project | [init](/docs/cli/init) |
+| **project link** | Link to existing server project | [init](/docs/cli/init#project-link) |
+
+### Model Creation
+
+| Command | Description | Read more |
+|---------|-------------|-----------|
+| **create table** | Create a semantic table model | [create](/docs/cli/create#table-table_path) → [Tables](/docs/semantic-model/tables) |
+| **create relation** | Create a relationship file | [create](/docs/cli/create#relation-relation_path) → [Relationships](/docs/semantic-model/relationships/cardinality) |
+| **create migration rename** | Create rename migration | [create](/docs/cli/create#migration-rename) |
+| **create migration swap** | Create swap migration | [create](/docs/cli/create#migration-swap) |
+
+### Table Management
+
+| Command | Description | Read more |
+|---------|-------------|-----------|
+| **table list** | List semantic table models | [table](/docs/cli/table) → [Tables](/docs/semantic-model/tables) |
+
+### Deployment
+
+| Command | Description | Read more |
+|---------|-------------|-----------|
+| **deploy** | Deploy project to server | [deploy](/docs/cli/deploy) |
+| **deploy status** | Check deployment status | [deploy](/docs/cli/deploy#status-command) |
+
+### Audit & Validation
+
+| Command | Description | Read more |
+|---------|-------------|-----------|
+| **audit** | Run validation checks (syntax, models, connections) | [audit](/docs/cli/audit) |
+
+### Utilities
+
+- **version** - Print CLI version
+- **adapters** - List supported adapters → [Adapters](/docs/cli/adapters)
+
+## Getting Help
+
+```bash
+strata COMMAND --help
+strata COMMAND SUBCOMMAND --help
+```
+
+## Command Aliases
+
+- `t` / `tbl` → `table`
+- `ds` → `datasource`
+- `a` → `audit`
+
+## Next Steps
+
+- [datasource](/docs/cli/datasource) - Configure datasources (start here after init)
+- [create](/docs/cli/create) - Create tables and relationships
+- [deploy](/docs/cli/deploy) - Deploy to server
+- [audit](/docs/cli/audit) - Validate before deploy
