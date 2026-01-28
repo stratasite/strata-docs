@@ -8,8 +8,8 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Getting Started',
+      link: { type: 'doc', id: 'getting-started/index' },
       items: [
-        'getting-started/index',
         'getting-started/installation',
         'getting-started/quickstart',
         'getting-started/concepts',
@@ -18,8 +18,8 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'CLI',
+      link: { type: 'doc', id: 'cli/index' },
       items: [
-        'cli/index',
         'cli/datasource',
         'cli/init',
         'cli/create',
@@ -29,8 +29,8 @@ const sidebars: SidebarsConfig = {
         {
           type: 'category',
           label: 'Adapters',
+          link: { type: 'doc', id: 'cli/adapters/index' },
           items: [
-            'cli/adapters/index',
             'cli/adapters/postgres',
             'cli/adapters/snowflake',
             'cli/adapters/mysql',
@@ -46,8 +46,8 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Guides',
+      link: { type: 'doc', id: 'guides/index' },
       items: [
-        'guides/index',
         'guides/creating-tables',
         'guides/fields-and-types',
         'guides/expressions',
@@ -61,28 +61,26 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Semantic Model',
+      link: { type: 'doc', id: 'semantic-model/index' },
       items: [
-        'semantic-model/index',
         'semantic-model/datasources',
         'semantic-model/tables',
         {
           type: 'category',
           label: 'Fields',
+          link: { type: 'doc', id: 'semantic-model/fields/index' },
           items: [
-            'semantic-model/fields/index',
             {
               type: 'category',
               label: 'Dimensions',
-              items: [
-                'semantic-model/fields/dimensions/index',
-                'semantic-model/fields/dimensions/date-time',
-              ],
+              link: { type: 'doc', id: 'semantic-model/fields/dimensions/index' },
+              items: ['semantic-model/fields/dimensions/date-time'],
             },
             {
               type: 'category',
               label: 'Measures',
+              link: { type: 'doc', id: 'semantic-model/fields/measures/index' },
               items: [
-                'semantic-model/fields/measures/index',
                 'semantic-model/fields/measures/compound',
                 'semantic-model/fields/measures/snapshot',
               ],
@@ -115,8 +113,8 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Advanced',
+      link: { type: 'doc', id: 'advanced/index' },
       items: [
-        'advanced/index',
         'advanced/extended-blending-groups',
         'advanced/exclusions',
         'advanced/inclusions',
@@ -137,8 +135,8 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Examples',
+      link: { type: 'doc', id: 'examples/index' },
       items: [
-        'examples/index',
         'examples/tpcds-tutorial',
         {
           type: 'category',
@@ -162,8 +160,8 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'API',
+      link: { type: 'doc', id: 'api/index' },
       items: [
-        'api/index',
         'api/json-schema',
         'api/openapi',
       ],
