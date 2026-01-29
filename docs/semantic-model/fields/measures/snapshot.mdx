@@ -1,0 +1,148 @@
+# Snapshot Measures
+
+Capture point-in-time values for inventory and balance analysis.
+
+## Overview
+
+Snapshot measures capture values at specific points in time (beginning or ending of a period). They're useful for inventory, account balances, and other point-in-time metrics.
+
+## Requirements
+
+1. **Table must have `snapshot_date`** - Specifies the date dimension
+2. **Measure must specify `snapshot`** - `ending` or `beginning`
+
+## Table Configuration
+
+Set the snapshot date dimension on the table:
+
+```yaml
+name: Inventory
+physical_name: inventory
+datasource: warehouse
+cost: 100
+snapshot_date: Date  # Required for snapshot measures
+
+fields:
+  - type: dimension
+    name: Date
+    data_type: date
+    expression:
+      sql: snapshot_date
+```
+
+## Measure Configuration
+
+### Ending Snapshot
+
+Capture value at the end of the period:
+
+```yaml
+- type: measure
+  name: Ending Inventory
+  data_type: integer
+  snapshot: ending
+  expression:
+    sql: sum(quantity)
+```
+
+### Beginning Snapshot
+
+Capture value at the beginning of the period:
+
+```yaml
+- type: measure
+  name: Beginning Inventory
+  data_type: integer
+  snapshot: beginning
+  expression:
+    sql: sum(quantity)
+```
+
+## How It Works
+
+When a user queries a snapshot measure:
+1. Planner identifies the snapshot date dimension
+2. Filters to the specified time period
+3. Selects the appropriate snapshot (beginning or ending)
+4. Generates SQL to capture point-in-time value
+
+## Use Cases
+
+### Inventory Analysis
+
+```yaml
+name: Inventory
+snapshot_date: Date
+
+fields:
+  - type: measure
+    name: Ending Inventory
+    snapshot: ending
+    expression:
+      sql: sum(quantity)
+```
+
+### Account Balances
+
+```yaml
+name: Accounts
+snapshot_date: Date
+
+fields:
+  - type: measure
+    name: Ending Balance
+    snapshot: ending
+    expression:
+      sql: sum(balance)
+```
+
+## Complete Example
+
+```yaml
+name: Inventory
+physical_name: inventory
+datasource: warehouse
+cost: 100
+snapshot_date: Date
+
+fields:
+  - type: dimension
+    name: Date
+    data_type: date
+    expression:
+      sql: snapshot_date
+
+  - type: dimension
+    name: Product ID
+    data_type: integer
+    expression:
+      sql: product_id
+
+  - type: measure
+    name: Beginning Inventory
+    data_type: integer
+    snapshot: beginning
+    expression:
+      sql: sum(quantity)
+
+  - type: measure
+    name: Ending Inventory
+    data_type: integer
+    snapshot: ending
+    expression:
+      sql: sum(quantity)
+```
+
+## Best Practices
+
+1. **Set snapshot_date** - Required on the table
+2. **Use descriptive names** - e.g. "Ending Inventory" not "Inventory"
+3. **Document purpose** - Add descriptions for snapshot behavior
+4. **Test queries** - Verify snapshot behavior
+
+## Next Steps
+
+- [Measures](/docs/semantic-model/fields/measures)
+- [Exclusions](/docs/advanced/exclusions)
+- [Inclusions](/docs/advanced/inclusions)
+- [Temporal decorators](/docs/advanced/decorators/temporal)

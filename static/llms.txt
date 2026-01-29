@@ -1,0 +1,55 @@
+# Strata Developer Documentation
+
+> Documentation for data engineers building semantic models with Strata CLI
+
+Strata is a semantic layer platform that transforms raw database tables into business-ready analytics models. This documentation covers the Strata CLI used by data engineers to define semantic models using YAML files.
+
+## Getting Started
+- [What is Strata](/docs/getting-started): Overview and concepts
+- [Installation](/docs/getting-started/installation): Install Strata CLI
+- [Quickstart](/docs/getting-started/quickstart): Create first model in 5 minutes
+- [Core Concepts](/docs/getting-started/concepts): Understanding the semantic layer
+
+## Guides
+- [Creating Tables](/docs/guides/creating-tables): Define semantic tables
+- [Fields and Types](/docs/guides/fields-and-types): Dimensions, measures, data types
+- [Expressions](/docs/guides/expressions): SQL expressions, lookups, primary keys
+- [Relationships](/docs/guides/relationships): Configure joins between tables
+- [Datasources](/docs/semantic-model/datasources): Configure database connections and tiers
+- [Migrations](/docs/guides/migrations): Rename and swap operations
+- [Testing](/docs/guides/testing): Validate your semantic model
+- [Deployment](/docs/guides/deployment): Deploy to Strata server
+- [CI/CD](/docs/guides/ci-cd): Automated deployment workflows
+
+## Semantic Model
+- [Semantic Model Overview](/docs/semantic-model): Deep dive into model capabilities
+- [Tables](/docs/semantic-model/tables): Table model reference
+- [Dimensions](/docs/semantic-model/fields/dimensions): Dimension fields
+- [Measures](/docs/semantic-model/fields/measures): Measure fields
+- [Data Types](/docs/semantic-model/fields/data-types): Supported data types
+- [SQL Expressions](/docs/semantic-model/expressions/sql): SQL expression syntax
+- [Relationships](/docs/semantic-model/relationships/cardinality): Join cardinality
+
+## Advanced Features
+- [Snapshot Measures](/docs/semantic-model/fields/measures/snapshot): Beginning/ending snapshots
+- [Exclusions](/docs/advanced/exclusions): Measure exclusions
+- [Inclusions](/docs/advanced/inclusions): Multi-level calculations
+- [Partitions](/docs/advanced/partitions): Date partitioning
+- [Cost Optimization](/docs/advanced/cost-optimization): Table cost and tier routing
+- [Temporal Decorators](/docs/advanced/decorators/temporal): YoY, MoM comparisons
+- [Window Decorators](/docs/advanced/decorators/window): Moving averages, ranking
+- [Multi-Datasource](/docs/advanced/multi-datasource): Cross-datasource queries
+
+## Reference
+- [CLI Commands](/docs/cli): Complete command reference
+- [Tables](/docs/semantic-model/tables) and [Relationships](/docs/semantic-model/relationships/cardinality): Model structure
+- [Adapters](/docs/cli/adapters): Database adapter configurations
+
+## Examples
+- [TPC-DS Tutorial](/docs/examples/tpcds-tutorial): Full walkthrough
+- [Star Schema](/docs/examples/patterns/star-schema): Star schema modeling
+- [Customer 360](/docs/examples/recipes/customer-360): Customer analytics recipe
+
+## API
+- [JSON Schema](/docs/api/json-schema): Machine-readable schema definitions
+- [OpenAPI](/docs/api/openapi): REST API reference

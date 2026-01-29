@@ -33,11 +33,17 @@ function generateDocsApiPlugin(
 
       const docsDir = path.join(context.siteDir, 'docs');
       const apiDir = path.join(outDir, 'api');
+      const schemaDir = path.join(apiDir, 'schema');
 
+      // Create API directories
       if (!fs.existsSync(apiDir)) {
         fs.mkdirSync(apiDir, {recursive: true});
       }
+      if (!fs.existsSync(schemaDir)) {
+        fs.mkdirSync(schemaDir, {recursive: true});
+      }
 
+      // Generate documentation index
       const docs = readDocsRecursive(docsDir, baseUrl);
       const sections = groupDocsBySection(docs, baseUrl);
 
@@ -55,10 +61,11 @@ function generateDocsApiPlugin(
       };
 
       fs.writeFileSync(
-        path.join(apiDir, 'docs-index.json'),
+        path.join(apiDir, 'docs.json'),
         JSON.stringify(index, null, 2)
       );
 
+      // Generate section JSON files
       for (const section of sections) {
         const sectionContent = {
           title: section.title,
@@ -78,9 +85,183 @@ function generateDocsApiPlugin(
         );
       }
 
-      console.log(`✓ Generated ${sections.length} section JSON files in ${apiDir}`);
+      // Generate JSON Schema files
+      generateJsonSchemas(schemaDir);
+
+      // Generate CLI commands JSON
+      generateCliCommands(apiDir, docs);
+
+      console.log(`✓ Generated API files in ${apiDir}`);
+      console.log(`✓ Generated ${sections.length} section JSON files`);
+      console.log(`✓ Generated JSON Schema files`);
     },
   };
+}
+
+function generateJsonSchemas(schemaDir: string) {
+  // Table Schema
+  const tableSchema = {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    title: 'Strata Table Model',
+    required: ['datasource', 'name', 'physical_name', 'cost', 'fields'],
+    properties: {
+      datasource: {type: 'string', description: 'Datasource key or name'},
+      name: {type: 'string', description: 'Logical table name'},
+      physical_name: {type: 'string', description: 'Physical table name in database'},
+      cost: {type: 'integer', description: 'Cost number (lower = preferred)'},
+      snapshot_date: {type: 'string', description: 'Snapshot date dimension name'},
+      tags: {type: 'array', items: {type: 'string'}},
+      partitions: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            dimension: {type: 'string'},
+            predicate: {enum: ['between', 'in_list']},
+            filter_value: {type: 'string'},
+            filter_value_end: {type: 'string'},
+            description: {type: 'string'},
+          },
+        },
+      },
+      imports: {type: 'array', items: {type: 'string'}},
+      fields: {
+        type: 'array',
+        items: {$ref: '#/definitions/field'},
+      },
+    },
+    definitions: {
+      field: {
+        type: 'object',
+        required: ['type', 'name', 'data_type', 'expression'],
+        properties: {
+          type: {enum: ['dimension', 'measure']},
+          name: {type: 'string'},
+          description: {type: 'string'},
+          data_type: {
+            enum: ['string', 'integer', 'bigint', 'decimal', 'date', 'date_time', 'boolean', 'binary'],
+          },
+          hidden: {type: 'boolean'},
+          display_type: {enum: ['default', 'html', 'url', 'email', 'phone_number', 'image']},
+          formatter: {type: 'string'},
+          disable_value_listing: {type: 'boolean'},
+          value_list_size: {type: 'integer'},
+          grains: {type: 'array', items: {type: 'string'}},
+          expression: {
+            type: 'object',
+            required: ['sql'],
+            properties: {
+              primary_key: {type: 'boolean'},
+              lookup: {type: 'boolean'},
+              array: {type: 'boolean'},
+              sql: {type: 'string'},
+            },
+          },
+        },
+      },
+    },
+  };
+
+  // Relation Schema
+  const relationSchema = {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    title: 'Strata Relation Model',
+    required: ['datasource'],
+    properties: {
+      datasource: {type: 'string', description: 'Datasource key'},
+    },
+    patternProperties: {
+      '.*': {
+        type: 'object',
+        required: ['left', 'right', 'sql', 'cardinality'],
+        properties: {
+          left: {type: 'string', description: 'Left table name'},
+          right: {type: 'string', description: 'Right table name'},
+          sql: {type: 'string', description: 'Join condition'},
+          cardinality: {enum: ['one_to_one', 'one_to_many', 'many_to_one']},
+          join: {enum: ['left', 'right', 'inner', 'full']},
+          allow_measure_expansion: {type: 'boolean'},
+        },
+      },
+    },
+  };
+
+  // Project Schema
+  const projectSchema = {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    title: 'Strata Project Configuration',
+    required: ['name', 'server'],
+    properties: {
+      name: {type: 'string'},
+      description: {type: 'string'},
+      uid: {type: 'string'},
+      server: {type: 'string'},
+      production_branch: {type: 'string'},
+      git: {type: 'string'},
+      project_id: {type: 'integer'},
+      environments: {
+        type: 'object',
+        patternProperties: {
+          '.*': {
+            type: 'object',
+            properties: {
+              server: {type: 'string'},
+              api_key: {type: 'string'},
+            },
+          },
+        },
+      },
+    },
+  };
+
+  fs.writeFileSync(
+    path.join(schemaDir, 'table.json'),
+    JSON.stringify(tableSchema, null, 2)
+  );
+  fs.writeFileSync(
+    path.join(schemaDir, 'relation.json'),
+    JSON.stringify(relationSchema, null, 2)
+  );
+  fs.writeFileSync(
+    path.join(schemaDir, 'project.json'),
+    JSON.stringify(projectSchema, null, 2)
+  );
+}
+
+function generateCliCommands(apiDir: string, docs: DocFile[]) {
+  const cliDocs = docs.filter((doc) => doc.section === 'reference' && doc.path.includes('cli/'));
+  
+  const commands = cliDocs.map((doc) => {
+    const title = doc.title;
+    const command = title.toLowerCase().replace(/\s+/g, '-');
+    const content = doc.content;
+    
+    // Extract command info from content
+    const synopsisMatch = content.match(/## Synopsis\s+```bash\s+(.+?)\s+```/s);
+    const descriptionMatch = content.match(/## Description\s+(.+?)(?=\n##|\n```|$)/s);
+    
+    return {
+      id: doc.id,
+      command,
+      title,
+      url: doc.url,
+      synopsis: synopsisMatch ? synopsisMatch[1] : '',
+      description: descriptionMatch ? descriptionMatch[1].trim() : '',
+    };
+  });
+
+  const cliDir = path.join(apiDir, 'cli');
+  if (!fs.existsSync(cliDir)) {
+    fs.mkdirSync(cliDir, {recursive: true});
+  }
+  
+  fs.writeFileSync(
+    path.join(cliDir, 'commands.json'),
+    JSON.stringify({commands}, null, 2)
+  );
 }
 
 function readDocsRecursive(
@@ -89,6 +270,11 @@ function readDocsRecursive(
   relativePath = ''
 ): DocFile[] {
   const files: DocFile[] = [];
+  
+  if (!fs.existsSync(dir)) {
+    return files;
+  }
+  
   const entries = fs.readdirSync(dir, {withFileTypes: true});
 
   for (const entry of entries) {
@@ -175,7 +361,16 @@ function groupDocsBySection(docs: DocFile[], baseUrl: string): Section[] {
   }
 
   const sections = Array.from(sectionsMap.values());
-  const sectionOrder = ['getting-started', 'concepts', 'guides', 'reference', 'root'];
+  const sectionOrder = [
+    'getting-started',
+    'guides',
+    'semantic-model',
+    'advanced',
+    'reference',
+    'examples',
+    'api',
+    'root',
+  ];
   sections.sort((a, b) => {
     const aIndex = sectionOrder.indexOf(a.id);
     const bIndex = sectionOrder.indexOf(b.id);

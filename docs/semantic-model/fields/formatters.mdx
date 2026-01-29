@@ -1,0 +1,179 @@
+# Formatters
+
+Apply formatting to field values for better presentation.
+
+## Overview
+
+Formatters control how field values are displayed in the UI. They apply formatting to numeric values and can override display types.
+
+## Built-in Formatters
+
+### currency_usd
+
+Format as USD currency.
+
+```yaml
+- type: measure
+  name: Total Revenue
+  data_type: decimal
+  formatter: currency_usd
+  expression:
+    sql: sum(amount)
+```
+
+**Output:** `$1,234.56`
+
+### percent
+
+Format as percentage.
+
+```yaml
+- type: measure
+  name: Profit Margin
+  data_type: decimal
+  formatter: percent
+  expression:
+    sql: sum(profit) / sum(revenue)
+```
+
+**Output:** `45.67%`
+
+### thousands
+
+Format with thousands separator.
+
+```yaml
+- type: measure
+  name: Order Count
+  data_type: integer
+  formatter: thousands
+  expression:
+    sql: count(*)
+```
+
+**Output:** `1,234`
+
+### millions
+
+Format in millions.
+
+```yaml
+- type: measure
+  name: Total Revenue
+  data_type: decimal
+  formatter: millions
+  expression:
+    sql: sum(amount)
+```
+
+**Output:** `1.23M`
+
+### billions
+
+Format in billions.
+
+```yaml
+- type: measure
+  name: Company Valuation
+  data_type: decimal
+  formatter: billions
+  expression:
+    sql: sum(valuation)
+```
+
+**Output:** `1.23B`
+
+## Custom Formatters
+
+Define custom JavaScript functions using numeral.js or moment.js:
+
+```yaml
+- type: measure
+  name: Custom Format
+  data_type: decimal
+  formatter: |
+    function(value) {
+      return numeral(value).format('0.00a');
+    }
+  expression:
+    sql: sum(amount)
+```
+
+**Available libraries:**
+- `numeral` - Number formatting
+- `moment` - Date/time formatting
+
+## Formatter vs Display Type
+
+Formatters override display types:
+
+```yaml
+# Formatter takes precedence
+- type: measure
+  name: Revenue
+  display_type: default
+  formatter: currency_usd  # This will be used
+  expression:
+    sql: sum(amount)
+```
+
+## Common Patterns
+
+### Currency
+
+```yaml
+- type: measure
+  name: Total Revenue
+  data_type: decimal
+  formatter: currency_usd
+  expression:
+    sql: sum(amount)
+```
+
+### Percentage
+
+```yaml
+- type: measure
+  name: Conversion Rate
+  data_type: decimal
+  formatter: percent
+  expression:
+    sql: sum(conversions) / sum(visits)
+```
+
+### Large Numbers
+
+```yaml
+- type: measure
+  name: Page Views
+  data_type: integer
+  formatter: thousands
+  expression:
+    sql: count(*)
+```
+
+### Millions/Billions
+
+```yaml
+- type: measure
+  name: Revenue
+  data_type: decimal
+  formatter: millions
+  expression:
+    sql: sum(amount)
+```
+
+## Best Practices
+
+1. **Use currency_usd** for monetary values
+2. **Use percent** for ratios and percentages
+3. **Use thousands** for large counts
+4. **Use millions/billions** for very large numbers
+5. **Keep custom formatters simple** - Complex logic should be in SQL
+
+## Next Steps
+
+- Learn about [dimensions](/docs/semantic-model/fields/dimensions)
+- Learn about [measures](/docs/semantic-model/fields/measures)
+- Explore [data types](/docs/semantic-model/fields/data-types)
+- Read about [display types](/docs/semantic-model/fields/dimensions#display_type)

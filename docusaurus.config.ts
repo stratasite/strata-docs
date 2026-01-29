@@ -2,6 +2,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import generateDocsApiPlugin from './src/plugins/generate-docs-api';
+import {siteUrls} from './src/site-urls';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -15,18 +16,13 @@ const config: Config = {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
 
-  // Set the production url of your site here
-  // Update this with your actual GitHub Pages URL
-  url: 'https://your-username.github.io',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  // Update this to match your repository name
-  baseUrl: '/strata-docs/',
+  // URLs: see src/site-urls.ts for dev vs prod (DOCS_ENV or NODE_ENV)
+  url: siteUrls.site,
+  baseUrl: siteUrls.baseUrl,
 
-  // GitHub pages deployment config.
-  // Update these with your actual GitHub username and repository name
-  // organizationName: 'your-username', // Usually your GitHub org/user name.
-  // projectName: 'strata-docs', // Usually your repo name.
+  // GitHub pages deployment config (when using *.github.io; override if using custom domain)
+  // organizationName: 'your-username',
+  // projectName: 'strata-docs',
   
   // Deployment configuration
   trailingSlash: false,
@@ -71,8 +67,11 @@ const config: Config = {
     navbar: {
       title: 'Strata Developer Docs',
       logo: {
-        alt: 'BI Semantic Model Logo',
-        src: 'img/logo.svg',
+        alt: 'Strata Developer Docs',
+        src: siteUrls.logoPath,
+        href: siteUrls.baseUrl,
+        width: 32,
+        height: 32,
       },
       items: [
         {
@@ -82,7 +81,7 @@ const config: Config = {
           label: 'Getting Started',
         },
         {
-          href: 'https://github.com/your-username/strata-docs',
+          href: siteUrls.github,
           label: 'GitHub',
           position: 'right',
         },
@@ -107,6 +106,14 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
+    // Algolia DocSearch (critical for search; required for GitHub Pages).
+    // Apply at https://docsearch.algolia.com/ and add credentials when ready.
+    // algolia: {
+    //   appId: 'YOUR_APP_ID',
+    //   apiKey: 'YOUR_SEARCH_API_KEY',
+    //   indexName: 'strata_developers',
+    //   contextualSearch: true,
+    // },
   } satisfies Preset.ThemeConfig,
 };
 

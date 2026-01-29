@@ -1,0 +1,106 @@
+# Sales Analysis Recipe
+
+Build a comprehensive sales analytics model.
+
+## Overview
+
+Sales analysis model for tracking revenue, orders, and sales performance.
+
+## Model Structure
+
+### Sales Fact
+
+```yaml
+name: Sales
+cost: 100
+
+fields:
+  - type: dimension
+    name: Sale ID
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: sale_id
+
+  - type: dimension
+    name: Sale Date
+    data_type: date
+    expression:
+      sql: sale_date
+
+  - type: measure
+    name: Total Revenue
+    data_type: decimal
+    formatter: currency_usd
+    expression:
+      sql: sum(amount)
+
+  - type: measure
+    name: Quantity Sold
+    data_type: integer
+    expression:
+      sql: sum(quantity)
+
+  - type: measure
+    name: Order Count
+    data_type: integer
+    expression:
+      sql: count(*)
+```
+
+### Product Dimension
+
+```yaml
+name: Product
+cost: 10
+
+fields:
+  - type: dimension
+    name: Product ID
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: product_id
+
+  - type: dimension
+    name: Product Name
+    data_type: string
+    expression:
+      sql: product_name
+
+  - type: dimension
+    name: Product Category
+    data_type: string
+    expression:
+      sql: category
+```
+
+### Relationships
+
+```yaml
+datasource: warehouse
+
+sales_product:
+  left: Sales
+  right: Product
+  sql: left.product_id = right.id
+  cardinality: many_to_one
+
+sales_date:
+  left: Sales
+  right: Date
+  sql: left.sale_date_id = right.date_id
+  cardinality: many_to_one
+```
+
+## Key Metrics
+
+- **Total Revenue** - Sum of sales amounts
+- **Quantity Sold** - Total units sold
+- **Order Count** - Number of sales transactions
+- **Average Order Value** - Revenue / Order Count
+
+## Next Steps
+
+- [Learn about measures](/docs/semantic-model/fields/measures)
+- [Explore relationships](/docs/cli/relationships)

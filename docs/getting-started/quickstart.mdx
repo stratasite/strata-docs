@@ -1,0 +1,416 @@
+# Quickstart
+
+This guide walks you from an empty directory to a deployed semantic model using a **pre-provisioned tutorial database**. You'll initialize a project, add the datasource, create table and relationship models for a simplified TPC-DS schema, then deploy. No database setup required.
+
+## Prerequisites
+
+- Strata CLI installed ([installation](/docs/getting-started/installation))
+- Familiarity with semantic model, tables, datasources, and relationships ([Core concepts](/docs/getting-started/concepts))
+
+## Tutorial database
+
+This quickstart uses a **Supabase-hosted PostgreSQL** database with a simplified TPC-DS schema (5 tables, ~564K rows). When adding the datasource (Step 2), use these connection details:
+
+| Field | Value |
+|-------|--------|
+| Host | `aws-1-ap-south-1.pooler.supabase.com` |
+| Port | `6543` |
+| Database | `postgres` |
+| Schema | `public` |
+| User | `strata-learner` |
+| Password | `5F{=C"zYr12>` |
+
+The schema is a star schema: one fact table (**store_sales**) and four dimension tables (**date_dim**, **store**, **item**, **customer**). See [Core concepts](/docs/getting-started/concepts) for tables and relationships.
+
+---
+
+## Step 1: Initialize a project
+
+Create a new Strata project:
+
+```bash
+strata init my-first-project
+cd my-first-project
+```
+
+This creates a directory with the following structure:
+
+```
+my-first-project/
+├── project.yml          # Project configuration
+├── datasources.yml      # Datasource definitions
+├── models/              # Semantic model files
+├── migrations/          # Migration files
+└── tests/               # Test definitions
+```
+
+---
+
+## Step 2: Add the tutorial datasource
+
+A **datasource** is a database connection that Strata uses to run queries. You define it once; tables and relationships reference it. See [Datasources](/docs/semantic-model/datasources) for tiers and options.
+
+Add the tutorial datasource:
+
+```bash
+strata datasource add postgres
+```
+
+When prompted, use the values from the **Tutorial database** table above. Use `tpcds` as the datasource key and any display name (e.g. `TPC-DS Quickstart`). Credentials are stored in the `.strata` file (gitignored); the CLI adds the connection to `datasources.yml`.
+
+---
+
+## Step 3: Test the connection
+
+Verify the datasource connects:
+
+```bash
+strata datasource test tpcds
+```
+
+You should see a success message. If not, double-check the host, port, user, and password.
+
+---
+
+## Step 4: Create table models
+
+A **table** model (`tbl.*.yml`) wraps a physical database table with semantic fields (dimensions and measures). See [Tables](/docs/semantic-model/tables) and [Creating tables](/docs/cli/creating-tables).
+
+The CLI can generate table models **with AI** (field suggestions) or **without AI** (metadata only). If you run without AI, the generated YAML may look different from the examples below. To match this quickstart and see results immediately, you can copy the `tbl.*.yml` and `rel.*.yml` snippets from this page into your `models/` files.
+
+Create semantic table models for all five tables. Run each command; the CLI connects to the datasource, fetches column metadata, and generates a YAML file. Accept the defaults or edit in the interactive editor.
+
+**Dimension tables (run in any order):**
+
+```bash
+strata create table common/date_dim
+strata create table common/store
+strata create table common/item
+strata create table common/customer
+```
+
+**Fact table:**
+
+```bash
+strata create table store/store_sales
+```
+
+This produces:
+
+- `models/common/tbl.date_dim.yml`
+- `models/common/tbl.store.yml`
+- `models/common/tbl.item.yml`
+- `models/common/tbl.customer.yml`
+- `models/store/tbl.store_sales.yml`
+
+Below are **minimal examples** for each table. Your generated files may have more fields; you can trim or extend them. Table **display names** (e.g. `Date`, `Store`, `Store Sales`) must match what you use in relationship files.
+
+**models/common/tbl.date_dim.yml** (dimension — dates):
+
+```yaml
+name: Date
+physical_name: date_dim
+datasource: tpcds
+cost: 10
+
+fields:
+  - type: dimension
+    name: Date SK
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: d_date_sk
+  - type: dimension
+    name: Date ID
+    data_type: string
+    expression:
+      sql: d_date_id
+  - type: dimension
+    name: Date
+    data_type: date
+    expression:
+      sql: d_date
+  - type: dimension
+    name: Year
+    data_type: integer
+    expression:
+      sql: d_year
+  - type: dimension
+    name: Month
+    data_type: integer
+    expression:
+      sql: d_month
+  - type: dimension
+    name: Day
+    data_type: integer
+    expression:
+      sql: d_day
+  - type: dimension
+    name: Day Name
+    data_type: string
+    expression:
+      sql: d_day_name
+  - type: dimension
+    name: Quarter
+    data_type: integer
+    expression:
+      sql: d_quarter
+```
+
+**models/common/tbl.store.yml** (dimension — stores):
+
+```yaml
+name: Store
+physical_name: store
+datasource: tpcds
+cost: 10
+
+fields:
+  - type: dimension
+    name: Store SK
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: s_store_sk
+  - type: dimension
+    name: Store ID
+    data_type: string
+    expression:
+      sql: s_store_id
+  - type: dimension
+    name: Store Name
+    data_type: string
+    expression:
+      sql: s_store_name
+  - type: dimension
+    name: City
+    data_type: string
+    expression:
+      sql: s_city
+  - type: dimension
+    name: State
+    data_type: string
+    expression:
+      sql: s_state
+  - type: dimension
+    name: ZIP
+    data_type: string
+    expression:
+      sql: s_zip
+```
+
+**models/common/tbl.item.yml** (dimension — products):
+
+```yaml
+name: Item
+physical_name: item
+datasource: tpcds
+cost: 10
+
+fields:
+  - type: dimension
+    name: Item SK
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: i_item_sk
+  - type: dimension
+    name: Item ID
+    data_type: string
+    expression:
+      sql: i_item_id
+  - type: dimension
+    name: Item Description
+    data_type: string
+    expression:
+      sql: i_item_desc
+  - type: dimension
+    name: Current Price
+    data_type: decimal
+    expression:
+      sql: i_current_price
+  - type: dimension
+    name: Brand
+    data_type: string
+    expression:
+      sql: i_brand
+  - type: dimension
+    name: Category
+    data_type: string
+    expression:
+      sql: i_category
+```
+
+**models/common/tbl.customer.yml** (dimension — customers):
+
+```yaml
+name: Customer
+physical_name: customer
+datasource: tpcds
+cost: 10
+
+fields:
+  - type: dimension
+    name: Customer SK
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: c_customer_sk
+  - type: dimension
+    name: Customer ID
+    data_type: string
+    expression:
+      sql: c_customer_id
+  - type: dimension
+    name: First Name
+    data_type: string
+    expression:
+      sql: c_first_name
+  - type: dimension
+    name: Last Name
+    data_type: string
+    expression:
+      sql: c_last_name
+  - type: dimension
+    name: Email Address
+    data_type: string
+    expression:
+      sql: c_email_address
+  - type: dimension
+    name: Birth Year
+    data_type: integer
+    expression:
+      sql: c_birth_year
+```
+
+**models/store/tbl.store_sales.yml** (fact — sales transactions):
+
+```yaml
+name: Store Sales
+physical_name: store_sales
+datasource: tpcds
+cost: 100
+
+fields:
+  - type: dimension
+    name: Ticket Number
+    data_type: integer
+    expression:
+      primary_key: true
+      sql: ss_ticket_number
+  - type: measure
+    name: Quantity Sold
+    data_type: integer
+    expression:
+      sql: sum(ss_quantity)
+  - type: measure
+    name: Sales Price
+    data_type: decimal
+    expression:
+      sql: sum(ss_sales_price)
+  - type: measure
+    name: Net Paid
+    data_type: decimal
+    expression:
+      sql: sum(ss_net_paid)
+```
+
+Dimension tables use a low `cost` (e.g. 10); the fact table uses a higher `cost` (e.g. 100) so the planner prefers the right table for each query.
+
+---
+
+## Step 5: Define relationships
+
+**Relationships** (`rel.*.yml`) define how tables join (left/right, join condition, cardinality). See [Relationships](/docs/semantic-model/relationships/cardinality).
+
+Create a relationship file for the fact table:
+
+```bash
+strata create relation store/store_sales
+```
+
+This creates `models/store/rel.store_sales.yml`. Edit it so **Store Sales** joins to each dimension table. Use the **display names** you gave the tables (e.g. `Date`, `Store`, `Item`, `Customer`, `Store Sales`).
+
+**models/store/rel.store_sales.yml:**
+
+```yaml
+datasource: tpcds
+
+# Store Sales (fact) to Date (dimension)
+store_sales_sold_date:
+  left: Store Sales
+  right: Date
+  sql: left.ss_sold_date_sk = right.d_date_sk
+  cardinality: many_to_one
+
+# Store Sales to Item
+store_sales_item:
+  left: Store Sales
+  right: Item
+  sql: left.ss_item_sk = right.i_item_sk
+  cardinality: many_to_one
+
+# Store Sales to Customer
+store_sales_customer:
+  left: Store Sales
+  right: Customer
+  sql: left.ss_customer_sk = right.c_customer_sk
+  cardinality: many_to_one
+
+# Store Sales to Store
+store_sales_store:
+  left: Store Sales
+  right: Store
+  sql: left.ss_store_sk = right.s_store_sk
+  cardinality: many_to_one
+```
+
+Each relationship is `many_to_one`: many store_sales rows link to one dimension row.
+
+---
+
+## Step 6: Run audit
+
+Check that the semantic model is valid before deploying:
+
+```bash
+strata audit
+```
+
+This validates YAML syntax, table and relationship definitions, and datasource connectivity. Fix any errors or warnings; the same checks run automatically when you deploy.
+
+---
+
+## Step 7: Deploy
+
+Deploy your semantic model to a Strata server:
+
+```bash
+strata deploy
+```
+
+**Before you deploy:**
+
+- **Strata server and API key** — Deploy pushes to a Strata server and requires an API key. Get the API key from your Strata web app (e.g. **Settings → API Keys**). The first time you run `strata deploy`, the CLI will prompt for the key and store it in `.strata`. See [Deployment](/docs/cli/deployment) for more.
+- **Uncommitted changes** — The CLI requires a clean Git working tree. If you see an error like **You have uncommitted changes. Please commit or stash them before deploying.**, commit your work and try again:
+
+  ```bash
+  git add .
+  git commit -m "Quickstart: tables and relationships"
+  strata deploy
+  ```
+
+Ensure `project.yml` has the correct `server` URL for your Strata instance. The CLI validates the model and uploads it for use in analytics.
+
+---
+
+## What you built
+
+You now have a small **star schema** in the semantic layer:
+
+- **One fact table:** Store Sales (transaction-level sales with measures like Quantity Sold, Sales Price, Net Paid).
+- **Four dimension tables:** Date, Store, Item, Customer (attributes for filtering and grouping).
+
+Relationships connect Store Sales to each dimension via surrogate keys (`ss_sold_date_sk`, `ss_item_sk`, `ss_customer_sk`, `ss_store_sk`). Users can slice measures by date, store, item, or customer without writing SQL.
+
+To list tables in your datasource anytime: `strata datasource tables tpcds`. To inspect a table: `strata datasource meta tpcds store_sales`.

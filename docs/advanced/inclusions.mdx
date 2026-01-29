@@ -1,0 +1,130 @@
+# Inclusions
+
+Force multi-level calculations with dimension inclusions.
+
+## Overview
+
+Inclusions force calculations at a lower level before rolling up. This enables multi-level aggregations like medians, percentiles, and other complex calculations.
+
+## How It Works
+
+1. **Base calculation** - Calculated at inclusion dimension level
+2. **Final aggregation** - Rolled up using specified aggregation function
+3. **Dimension inclusion** - Forces calculation at specific dimension level
+
+## Structure
+
+```yaml
+inclusions:
+  filter: apply        # ignore, only, apply
+  aggregation: string  # Final rollup calculation (SQL)
+  dimensions:
+    - Dimension Name
+```
+
+## Use Cases
+
+### Median Calculation
+
+```yaml
+- type: measure
+  name: Median Order Value
+  data_type: decimal
+  inclusions:
+    filter: apply
+    aggregation: percentile_cont(0.5) WITHIN GROUP (ORDER BY @exp)
+    dimensions:
+      - Product Category
+  expression:
+    sql: sum(amount)
+```
+
+**How it works:**
+1. Calculate `sum(amount)` at Product Category level
+2. Apply `percentile_cont(0.5)` to roll up to median
+
+### Percentile Calculation
+
+```yaml
+- type: measure
+  name: 90th Percentile Order Value
+  data_type: decimal
+  inclusions:
+    filter: apply
+    aggregation: percentile_cont(0.9) WITHIN GROUP (ORDER BY @exp)
+    dimensions:
+      - Customer Segment
+  expression:
+    sql: sum(amount)
+```
+
+### Custom Aggregation
+
+```yaml
+- type: measure
+  name: Custom Metric
+  data_type: decimal
+  inclusions:
+    filter: apply
+    aggregation: stddev(@exp)  # Standard deviation
+    dimensions:
+      - Region
+  expression:
+    sql: sum(amount)
+```
+
+## Filter Options
+
+### ignore
+
+Ignore inclusion dimensions in final calculation.
+
+```yaml
+filter: ignore
+```
+
+### only
+
+Only use inclusion dimensions.
+
+```yaml
+filter: only
+```
+
+### apply
+
+Apply normal filtering/grouping.
+
+```yaml
+filter: apply
+```
+
+## Complete Example
+
+```yaml
+- type: measure
+  name: Median Revenue by Product
+  description: Median revenue calculated at product level
+  data_type: decimal
+  formatter: currency_usd
+  inclusions:
+    filter: apply
+    aggregation: percentile_cont(0.5) WITHIN GROUP (ORDER BY @exp)
+    dimensions:
+      - Product Category
+  expression:
+    sql: sum(amount)
+```
+
+## Best Practices
+
+1. **Use for complex calculations** - Medians, percentiles, standard deviation
+2. **Document aggregation** - Explain what the inclusion does
+3. **Test carefully** - Verify multi-level calculations work correctly
+4. **Use descriptive names** - "Median Order Value" not "Order Value"
+
+## Next Steps
+
+- Learn about [exclusions](/docs/advanced/exclusions)
+- Explore [snapshot measures](/docs/semantic-model/fields/measures/snapshot)
+- Read about [window decorators](/docs/advanced/decorators/window)

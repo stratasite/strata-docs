@@ -1,0 +1,36 @@
+# API
+
+Machine-readable API for AI agents and integrations.
+
+## Overview
+
+The Strata documentation API provides JSON endpoints for programmatic access to documentation content, schemas, and CLI commands.
+
+## Endpoints
+
+- **[JSON Schema](/docs/api/json-schema)** - JSON Schema definitions for all YAML file types
+- **[OpenAPI](/docs/api/openapi)** - REST API reference (if applicable)
+
+## Usage
+
+Access API endpoints at:
+
+```
+/api/docs.json          # Full documentation index
+/api/schema/table.json  # Table YAML JSON Schema
+/api/schema/relation.json # Relation YAML JSON Schema
+/api/cli/commands.json  # CLI commands with options
+```
+
+## AI Agent Integration
+
+The API is designed for AI agents to:
+- Discover available commands
+- Understand YAML schemas
+- Navigate documentation structure
+- Generate code examples
+
+## Next Steps
+
+- [Explore JSON Schema](/docs/api/json-schema)
+- [Read OpenAPI spec](/docs/api/openapi)

@@ -1,0 +1,142 @@
+# Exclusions
+
+Exclude dimensions from measure calculations.
+
+## Overview
+
+Exclusions allow you to exclude certain dimensions from grouping or filtering when calculating measures. This is useful for measures that should ignore certain dimensions.
+
+## Exclusion Types
+
+### exclude
+
+Exclude specific dimensions.
+
+```yaml
+- type: measure
+  name: Revenue (Excluding Returns)
+  data_type: decimal
+  exclusion_type: exclude
+  exclusions:
+    - type: dimension
+      filter: apply
+      entities:
+        - Return Status
+  expression:
+    sql: sum(amount)
+```
+
+### exclude_all_except
+
+Exclude all dimensions except specified ones.
+
+```yaml
+- type: measure
+  name: Revenue (Only by Product)
+  data_type: decimal
+  exclusion_type: exclude_all_except
+  exclusions:
+    - type: dimension
+      filter: apply
+      entities:
+        - Product Category
+  expression:
+    sql: sum(amount)
+```
+
+### exclude_all
+
+Exclude all dimensions.
+
+```yaml
+- type: measure
+  name: Total Revenue (No Grouping)
+  data_type: decimal
+  exclusion_type: exclude_all
+  expression:
+    sql: sum(amount)
+```
+
+## Exclusion Structure
+
+```yaml
+exclusion_type: exclude  # exclude, exclude_all_except, exclude_all
+exclusions:
+  - type: dimension      # dimension, table, universe
+    filter: apply        # ignore, only, apply
+    entities:
+      - Dimension Name
+```
+
+## Filter Options
+
+### ignore
+
+Ignore the dimension (don't filter or group by it).
+
+```yaml
+filter: ignore
+```
+
+### only
+
+Only use this dimension (exclude others).
+
+```yaml
+filter: only
+```
+
+### apply
+
+Apply normal filtering/grouping.
+
+```yaml
+filter: apply
+```
+
+## Use Cases
+
+### Exclude Returns
+
+```yaml
+- type: measure
+  name: Net Revenue
+  data_type: decimal
+  exclusion_type: exclude
+  exclusions:
+    - type: dimension
+      filter: apply
+      entities:
+        - Return Status
+  expression:
+    sql: sum(amount)
+```
+
+### Only Group by Product
+
+```yaml
+- type: measure
+  name: Product Revenue
+  data_type: decimal
+  exclusion_type: exclude_all_except
+  exclusions:
+    - type: dimension
+      filter: apply
+      entities:
+        - Product Category
+  expression:
+    sql: sum(amount)
+```
+
+## Best Practices
+
+1. **Use descriptive names** - "Revenue (Excluding Returns)" not "Revenue"
+2. **Document exclusions** - Add descriptions explaining what's excluded
+3. **Test carefully** - Verify exclusion behavior works as expected
+4. **Use sparingly** - Exclusions can be confusing for users
+
+## Next Steps
+
+- Learn about [inclusions](/docs/advanced/inclusions)
+- Explore [snapshot measures](/docs/semantic-model/fields/measures/snapshot)
+- Read about [decorators](/docs/advanced/decorators/temporal)
