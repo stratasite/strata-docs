@@ -414,10 +414,6 @@ function extractRelatedLinks(items: DocFile[]): Array<{title: string; url: strin
 }
 
 function normalizeLink(link: string, currentUrl: string): string {
-  // Internal links: /docs/xxx is legacy (routeBasePath was 'docs'); now we use /xxx under baseUrl
-  if (link.startsWith('/docs/')) {
-    return '/' + link.replace(/^\/docs\/?/, '');
-  }
   if (link.startsWith('/')) {
     return link;
   }

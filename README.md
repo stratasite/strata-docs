@@ -5,46 +5,41 @@ Documentation site for Strata Semantic Analytics, built with [Docusaurus](https:
 ## Installation
 
 ```bash
-yarn install
+npm install
 ```
 
 ## Local Development
 
-The site uses the same base path locally as in production so you can test the exact URLs before pushing.
-
 ```bash
 npm run start
-# or: yarn start
 ```
 
-Then open **http://localhost:3000/docs/developers/** in your browser (same path as production at https://strata.do/docs/developers/). Most changes are reflected live without restarting the server.
+This starts a local development server at **http://localhost:3000/developer-docs/**. The local URL structure matches production so you can test exact URLs before deploying.
+
+Most changes are reflected live without restarting the server.
 
 ## Build
 
 ```bash
-yarn build
+npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+This command generates static content into the `build` directory.
 
 ## Deployment
 
-Docs are built for the path **`/docs/developers/`** and deployed to the main site so they are served at **https://strata.do/docs/developers/**.
+The site is deployed to GitHub Pages at `/developer-docs/` path.
 
-- **CI (recommended):** On push to `main`, the GitHub Action builds the site and pushes the output into the `stratasite.github.io` repo under `docs/developers/`. Configure in the developer-docs repo:
-  - **Settings → Secrets and variables → Actions:** add `MAIN_SITE_TOKEN` (a Personal Access Token with write access to the `stratasite/stratasite.github.io` repo).
-
-- **Local / manual:** Build with the same base URL, then copy the `build/` contents into the main site repo at `docs/developers/`:
-
-  ```bash
-  DOCS_BASE_URL=/docs/developers/ npm run build
-  # Copy build/* into stratasite.github.io repo at docs/developers/
-  ```
-
-Legacy deploy via Docusaurus (e.g. to a separate gh-pages branch):
+Using SSH:
 
 ```bash
-USE_SSH=true yarn deploy
-# or
-GIT_USER=<Your GitHub username> yarn deploy
+USE_SSH=true npm run deploy
 ```
+
+Not using SSH:
+
+```bash
+GIT_USER=<Your GitHub username> npm run deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.

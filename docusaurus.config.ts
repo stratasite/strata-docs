@@ -5,8 +5,8 @@ import generateDocsApiPlugin from './src/plugins/generate-docs-api';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
-// URL config: same path locally and on strata.do so local testing matches production.
-// Local: http://localhost:3000/docs/developers/ — Production: https://strata.do/docs/developers/
+// URL config: baseUrl is /developer-docs/ both locally and in production
+// Local: http://localhost:3000/developer-docs/ — Production: https://strata.do/developer-docs/
 const isProd = process.env.NODE_ENV === 'production';
 const envOverride = process.env.DOCS_ENV;
 const baseUrlEnv = process.env.DOCS_BASE_URL;
@@ -14,7 +14,7 @@ const isProduction = envOverride === 'production' || (envOverride !== 'developme
 const baseUrl =
   baseUrlEnv && baseUrlEnv.startsWith('/') && baseUrlEnv.endsWith('/')
     ? baseUrlEnv
-    : '/docs/developers/';
+    : '/developer-docs/';
 const siteUrl = isProduction ? 'https://strata.do' : 'http://localhost:3000';
 const githubUrl = 'https://github.com/stratasite/developer-docs';
 const logoPath = 'img/logo.svg';
@@ -55,7 +55,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Empty so URLs are /docs/developers/<slug> not /docs/developers/docs/<slug>
+          // Serve docs at baseUrl root (no /docs/ prefix in URL)
           routeBasePath: '/',
         },
         blog: false,
