@@ -14,7 +14,7 @@ After completing this guide, you will be able to:
 ## Prerequisites
 
 - Strata CLI installed
-- A Strata project initialized (see [Projects](/docs/cli/projects))
+- A Strata project initialized (see [Projects](/cli/projects))
 - Database connection details (host, port, credentials, etc.)
 
 ## Step 1: Add a Datasource
@@ -43,7 +43,7 @@ If you omit the adapter, the CLI prompts you to choose one:
 strata datasource add
 ```
 
-**AI features:** After adding a datasource, the CLI may prompt to enable AI-powered features for table generation (provider and API key). If enabled, credentials are stored in `.strata` and are not committed to git. You can configure AI later with `strata datasource auth` or by editing `.strata`. See [Creating Tables](/docs/cli/tables) for using AI when creating table models.
+**AI features:** After adding a datasource, the CLI may prompt to enable AI-powered features for table generation (provider and API key). If enabled, credentials are stored in `.strata` and are not committed to git. You can configure AI later with `strata datasource auth` or by editing `.strata`. See [Creating Tables](/cli/tables) for using AI when creating table models.
 
 ## Step 2: Set Credentials
 
@@ -77,7 +77,7 @@ List tables in a datasource:
 strata datasource tables warehouse
 ```
 
-If you omit the datasource key, the CLI prompts you to choose one. You can search and filter tables, then select one (e.g. to copy the name for use with [Creating Tables](/docs/cli/tables)).
+If you omit the datasource key, the CLI prompts you to choose one. You can search and filter tables, then select one (e.g. to copy the name for use with [Creating Tables](/cli/tables)).
 
 **Options:**
 - `-p, --pattern PATTERN` - Filter by regex pattern
@@ -118,7 +118,7 @@ Install missing gems with `gem install <gem_name>` if needed.
 
 ## Tier Configuration
 
-When adding or editing a datasource, you can set a **tier** (`hot`, `warm`, or `cold`). Tiers influence query routing and performance. For a full explanation, see [Datasources](/docs/semantic-model/datasources#tier-configuration).
+When adding or editing a datasource, you can set a **tier** (`hot`, `warm`, or `cold`). Tiers influence query routing and performance. For a full explanation, see [Datasources](/semantic-model/datasources#tier-configuration).
 
 ## Configuration Files
 
@@ -153,7 +153,7 @@ warehouse:
 
 1. **Use descriptive datasource keys** - e.g. `warehouse`, `analytics`, not `ds1`
 2. **Test after adding** - Run `strata datasource test <key>` before creating tables
-3. **Set appropriate tiers** - Match performance characteristics (see [Datasources](/docs/semantic-model/datasources#tier-configuration))
+3. **Set appropriate tiers** - Match performance characteristics (see [Datasources](/semantic-model/datasources#tier-configuration))
 4. **Never commit credentials** - Keep `.strata` out of git
 
 ## Troubleshooting
@@ -176,6 +176,6 @@ warehouse:
 
 ## Next Steps
 
-- [Creating Tables](/docs/cli/tables) - Create semantic table models from datasource tables
-- [Datasources (tiers, full config)](/docs/semantic-model/datasources)
-- [Adapters](/docs/semantic-model/adapters) - Adapter-specific configuration
+- [Creating Tables](/cli/tables) - Create semantic table models from datasource tables
+- [Datasources (tiers, full config)](/semantic-model/datasources)
+- [Adapters](/semantic-model/adapters) - Adapter-specific configuration

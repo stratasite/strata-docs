@@ -5,7 +5,8 @@ import generateDocsApiPlugin from './src/plugins/generate-docs-api';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
-// URL config: NODE_ENV from npm run start/build; DOCS_ENV overrides; DOCS_BASE_URL for subpath (e.g. GitHub Pages /developer-docs/)
+// URL config: same path locally and on strata.do so local testing matches production.
+// Local: http://localhost:3000/docs/developers/ — Production: https://strata.do/docs/developers/
 const isProd = process.env.NODE_ENV === 'production';
 const envOverride = process.env.DOCS_ENV;
 const baseUrlEnv = process.env.DOCS_BASE_URL;
@@ -13,9 +14,9 @@ const isProduction = envOverride === 'production' || (envOverride !== 'developme
 const baseUrl =
   baseUrlEnv && baseUrlEnv.startsWith('/') && baseUrlEnv.endsWith('/')
     ? baseUrlEnv
-    : '/';
+    : '/docs/developers/';
 const siteUrl = isProduction ? 'https://strata.do' : 'http://localhost:3000';
-const githubUrl = 'https://github.com/your-username/strata-docs';
+const githubUrl = 'https://github.com/stratasite/developer-docs';
 const logoPath = 'img/logo.svg';
 
 const config: Config = {
@@ -32,8 +33,8 @@ const config: Config = {
   baseUrl,
 
   // GitHub pages deployment config (when using *.github.io; override if using custom domain)
-  // organizationName: 'your-username',
-  // projectName: 'strata-docs',
+  // organizationName: 'stratasite',
+  // projectName: 'developer-docs',
   
   // Deployment configuration
   trailingSlash: false,
@@ -54,7 +55,8 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          routeBasePath: 'docs',
+          // Empty so URLs are /docs/developers/<slug> not /docs/developers/docs/<slug>
+          routeBasePath: '/',
         },
         blog: false,
         theme: {
@@ -106,7 +108,7 @@ const config: Config = {
           items: [
             {
               label: 'Getting Started',
-              to: '/docs/getting-started/installation',
+              to: 'getting-started/installation',
             },
           ],
         },

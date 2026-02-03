@@ -6,7 +6,7 @@ Use extended blending groups to treat the same logical dimension across multiple
 
 When the same business dimension (e.g. Order Date, Ship Date, Activity Date) exists in several tables with different column names or grains, you can assign a shared **`extended_blend_group`** on each. The planner can then blend these dimensions so that a single query can group or filter by that concept across tables.
 
-For the basic YAML setup, see [Extended blending](/docs/semantic-model/expressions/extended-blending).
+For the basic YAML setup, see [Extended blending](/semantic-model/expressions/extended-blending).
 
 ## When to Use Extended Blending
 
@@ -117,10 +117,10 @@ Queries that use “Activity Date” can then apply it across sales, returns, an
 
 ## Relation to Relationships and Paths
 
-Blending does not replace [relationships](/docs/semantic-model/relationships/cardinality). Tables still need proper `one_to_many`, `many_to_one`, or `one_to_one` relationships. Extended blend groups tell the planner how to treat dimensions that live in different tables as one for grouping and filtering when paths exist.
+Blending does not replace [relationships](/semantic-model/relationships/cardinality). Tables still need proper `one_to_many`, `many_to_one`, or `one_to_one` relationships. Extended blend groups tell the planner how to treat dimensions that live in different tables as one for grouping and filtering when paths exist.
 
 ## Next Steps
 
-- [Extended blending](/docs/semantic-model/expressions/extended-blending) — YAML and `extended_blend_group` on dimensions
-- [Dimensions](/docs/semantic-model/fields/dimensions)
-- [Relationships](/docs/semantic-model/relationships/cardinality)
+- [Extended blending](/semantic-model/expressions/extended-blending) — YAML and `extended_blend_group` on dimensions
+- [Dimensions](/semantic-model/fields/dimensions)
+- [Relationships](/semantic-model/relationships/cardinality)

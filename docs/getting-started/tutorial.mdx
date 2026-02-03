@@ -1,0 +1,213 @@
+# Tutorial: TPC-DS with DuckDB
+
+This tutorial walks you through building a semantic model for the TPC-DS benchmark using **DuckDB** on your local machine. You will clone the Strata TPC-DS tutorial repository, connect it to a local DuckDB database, and complete the model by adding the missing web channel tables and relationships. No cloud database or hosting is required.
+
+## Overview
+
+By the end of this tutorial you will have:
+
+- A local DuckDB database populated with TPC-DS data
+- A Strata project (cloned from [tpcds-tutorial](https://github.com/stratasite/tpcds-tutorial)) with table and relationship models for store, catalog, and inventory channels
+- Your own additions: the **web channel** tables and relationships (web_site, web_page, promotion, web_sales, web_returns) that are intentionally left out of the repository as a learning exercise
+
+## Prerequisites
+
+- **Ruby 3.4.4+** and **Git** installed
+- **Strata CLI** installed ([Installation](/getting-started/installation))
+- Familiarity with [Core concepts](/getting-started/concepts) (tables, relationships, datasources)
+
+## Step 1: Set Up DuckDB with TPC-DS Data
+
+DuckDB is an embedded analytics database that runs as a single file. The TPC-DS benchmark is available as a DuckDB extension, so you can generate the schema and data without installing a separate database server.
+
+### Install DuckDB
+
+Install the DuckDB CLI for your platform. See the [DuckDB installation guide](https://duckdb.org/docs/installation) for details.
+
+**Example (macOS with Homebrew):**
+
+```bash
+brew install duckdb
+```
+
+### Create the TPC-DS Database
+
+Create a new DuckDB database file and load the TPC-DS extension. Then generate the schema and data.
+
+1. Create and open a database file (e.g. `tpcds.duckdb` in a directory of your choice):
+
+```bash
+duckdb tpcds.duckdb
+```
+
+2. In the DuckDB shell, run:
+
+```sql
+INSTALL tpcds;
+LOAD tpcds;
+CALL dsdgen(sf=1);
+```
+
+This installs the TPC-DS extension, loads it, and generates data at scale factor 1. For schema only (no data), use `CALL dsdgen(sf=0);`. See the [DuckDB TPC-DS extension documentation](https://duckdb.org/docs/stable/core_extensions/tpcds) for more options.
+
+3. Exit the DuckDB shell (e.g. `.quit` or `Ctrl+D`).
+
+You now have a file `tpcds.duckdb` containing the full TPC-DS schema and data. Note its full path; you will use it in the next step.
+
+## Step 2: Clone the TPC-DS Tutorial Repository
+
+Clone the Strata TPC-DS tutorial project. It already contains table and relationship models for the store, catalog, and inventory channels, plus shared dimension tables.
+
+```bash
+git clone https://github.com/stratasite/tpcds-tutorial
+cd tpcds-tutorial
+```
+
+### Project Structure
+
+```
+tpcds-tutorial/
+├── project.yml          # Project configuration
+├── datasources.yml      # Datasource definitions (you will edit this)
+├── models/              # Semantic model files
+│   ├── catalog/         # Catalog channel (catalog_sales, catalog_returns, etc.)
+│   ├── common/          # Shared dimensions (date_dim, customer, item, etc.)
+│   ├── inventory/       # Inventory fact and relationships
+│   └── store/           # Store channel (store_sales, store_returns, etc.)
+├── migrations/
+└── tests/
+```
+
+The repository is **intentionally incomplete**: it does not include the **web channel** (web_sales, web_returns, web_site, web_page, promotion). You will add those in a later step.
+
+## Step 3: Configure the DuckDB Datasource
+
+The cloned project may be configured for PostgreSQL. Point it at your local DuckDB file instead.
+
+1. Open `datasources.yml`.
+2. Set the `tpcds` datasource to use the DuckDB adapter and the path to your database file. Use an absolute path to avoid path issues.
+
+**Example `datasources.yml`:**
+
+```yaml
+tpcds:
+  name: TPC-DS (DuckDB)
+  adapter: duckdb
+  tier: hot
+  query_timeout: 3600
+  file: /path/to/your/tpcds.duckdb
+```
+
+Replace `/path/to/your/tpcds.duckdb` with the actual path to the `tpcds.duckdb` file you created in Step 1. For more options, see the [DuckDB adapter](/semantic-model/adapters/duckdb) reference.
+
+## Step 4: Test the Connection
+
+Verify that Strata CLI can connect to your DuckDB database:
+
+```bash
+strata datasource test tpcds
+```
+
+You should see a success message. If not, check that the `file` path in `datasources.yml` is correct and that the file exists.
+
+Optional: list tables in the datasource to confirm TPC-DS tables are present:
+
+```bash
+strata datasource tables tpcds
+```
+
+## Step 5: Explore Existing Tables and Relationships
+
+Before adding new content, skim the existing models to understand the patterns.
+
+- **Fact tables** (e.g. `models/store/tbl.store_sales.yml`, `models/catalog/tbl.catalog_sales.yml`) have `cost: 100` and define measures with aggregations like `sum(ss_quantity)`.
+- **Dimension tables** (e.g. `models/common/tbl.date_dim.yml`, `models/common/tbl.customer.yml`) have `cost: 10` and define dimensions with `sql` expressions pointing at physical columns.
+- **Relationship files** (e.g. `models/store/rel.store.yml`) define `many_to_one` relationships from fact tables to dimension tables using the table display names and key columns.
+
+The same patterns apply to the web channel tables you will add next.
+
+## Step 6: Exercise — Add the Web Channel Tables
+
+The TPC-DS benchmark includes a **web channel**: fact tables `web_sales` and `web_returns`, and dimension tables `web_site`, `web_page`, and `promotion`. These are not in the tutorial repository; you will add them to practice defining tables and relationships.
+
+### 6a. Create a Web Directory
+
+Create a directory for web channel models:
+
+```bash
+mkdir -p models/web
+```
+
+### 6b. Add Dimension Tables (web_site, web_page, promotion)
+
+Add semantic table models for the three dimension tables. You can use the CLI to scaffold from the database:
+
+```bash
+strata create table web/web_site
+strata create table web/web_page
+strata create table web/promotion
+```
+
+Then edit the generated YAML files under `models/web/`. Follow the same style as existing dimensions (e.g. `tbl.store.yml`, `tbl.item.yml`): set `name`, `physical_name`, `datasource: tpcds`, `cost: 10`, and define dimensions with `expression.sql` pointing at the physical columns. Mark primary key columns with `primary_key: true`. Use display names like "Web Site", "Web Page", and "Promotion" so they are easy to reference in relationships.
+
+If you prefer to write the YAML by hand, use `strata datasource meta tpcds web_site` (and similarly for `web_page`, `promotion`) to inspect column names in the DuckDB database.
+
+### 6c. Add Fact Tables (web_sales, web_returns)
+
+Create table models for the web fact tables:
+
+```bash
+strata create table web/web_sales
+strata create table web/web_returns
+```
+
+Edit the generated files: set `cost: 100`, define dimensions for key columns (e.g. sold date, item, customer, web site, web page, promotion) and measures with aggregations (e.g. `sum(ws_quantity)`, `sum(ws_sales_price)`). Use display name "Web Sales" for `web_sales` and "Web Returns" for `web_returns`. Align field names and key columns with the existing store/catalog patterns so relationships can join on the correct keys.
+
+## Step 7: Create Relationships for the Web Channel
+
+Create a relationship file for the web channel so that Web Sales and Web Returns can join to the dimension tables.
+
+```bash
+strata create relation web/web_sales
+```
+
+This creates a relationship file (e.g. `models/web/rel.web_sales.yml`). Edit it to define `many_to_one` relationships from **Web Sales** and **Web Returns** to the dimensions (Date, Time, Item, Customer, Web Site, Web Page, Promotion, Customer Demographics, Household Demographics, Customer Address, etc.). Use the same structure as `models/store/rel.store.yml`: set `datasource: tpcds`, then for each relationship set `left`, `right`, `sql` (e.g. `left.ws_sold_date_sk = right.d_date_sk`), and `cardinality: many_to_one`. Use the **display names** of the tables (e.g. "Web Sales", "Date", "Item") so Strata can resolve them.
+
+If you prefer a single file for the whole web channel, you can instead create `models/web/rel.web.yml` and define all web channel relationships there, following the same pattern.
+
+## Step 8: Run Audit and Fix Issues
+
+Validate the full semantic model:
+
+```bash
+strata audit
+```
+
+Fix any reported errors (e.g. typos in table names, missing relationships, or invalid SQL). Keep running `strata audit` until it passes.
+
+## Step 9: Deploy (Optional)
+
+If you have a Strata server and API key configured, you can deploy your model:
+
+```bash
+strata deploy
+```
+
+See [Deployment](/cli/deployment) for server URL, API keys, and Git requirements. Deployment is optional for this tutorial; the main goal is to have a complete, audited semantic model.
+
+## Summary
+
+You have:
+
+1. Installed DuckDB and created a local TPC-DS database using the [DuckDB TPC-DS extension](https://duckdb.org/docs/stable/core_extensions/tpcds).
+2. Cloned the [tpcds-tutorial](https://github.com/stratasite/tpcds-tutorial) repository and configured it to use your DuckDB file.
+3. Explored the existing store, catalog, and inventory models.
+4. Added the missing web channel tables (web_site, web_page, promotion, web_sales, web_returns) and relationships.
+5. Run `strata audit` and optionally deployed to a Strata server.
+
+## Next Steps
+
+- [TPC-DS Tutorial (Examples)](/examples/tpcds-tutorial) — Deeper dive into the TPC-DS model and patterns
+- [Star schema pattern](/examples/patterns/star-schema) — How fact and dimension tables relate
+- [CLI Reference](/cli) — All Strata CLI commands
+- [Semantic Model](/semantic-model/tables) — Tables, fields, and relationships in detail

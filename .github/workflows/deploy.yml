@@ -1,20 +1,19 @@
-name: Deploy to GitHub Pages
+name: Deploy docs to strata.do
 
 on:
   push:
     branches:
       - main
-    # Review gh actions docs if you want to further define triggers, paths, etc
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# Deploy built docs into the main site repo (stratasite.github.io) at docs/developers/
+# so they are served at https://strata.do/docs/developers/
+# GitHub does not allow a project site at an arbitrary path; the main site must host this folder.
 jobs:
-  deploy:
-    name: Deploy to GitHub Pages
+  build:
+    name: Build docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,18 +29,46 @@ jobs:
 
       - name: Build website
         env:
-          # Required when deployed to a subpath (e.g. GitHub Pages at /developer-docs/)
-          DOCS_BASE_URL: /developer-docs/
+          DOCS_BASE_URL: /docs/developers/
         run: npm run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
+          name: docs-build
           path: build
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  deploy-to-main-site:
+    name: Deploy to strata.do/docs/developers
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main site repo
+        uses: actions/checkout@v4
+        with:
+          # Set MAIN_SITE_TOKEN secret to a PAT with write access to the main site repo
+          repository: stratasite/stratasite.github.io
+          token: ${{ secrets.MAIN_SITE_TOKEN }}
+          path: main-site
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-build
+          path: build
+
+      - name: Copy docs to docs/developers
+        run: |
+          rm -rf main-site/docs/developers
+          mkdir -p main-site/docs/developers
+          cp -r build/* main-site/docs/developers/
+
+      - name: Commit and push
+        working-directory: main-site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/developers
+          git diff --staged --quiet || (git commit -m "docs: update developer docs from developer-docs repo" && git push)

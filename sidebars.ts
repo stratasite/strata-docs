@@ -14,6 +14,7 @@ const sidebars: SidebarsConfig = {
         'getting-started/installation',
         'getting-started/concepts',
         'getting-started/quickstart',
+        'getting-started/tutorial',
       ],
     },
     // 2. CLI (guide-style pages)

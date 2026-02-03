@@ -296,7 +296,7 @@ function readDocsRecursive(
 
       const urlPath = relPath.replace(/\.(md|mdx)$/, '').replace(/\\/g, '/');
       const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-      const url = `${cleanBaseUrl}/docs/${urlPath}`;
+      const url = `${cleanBaseUrl}/${urlPath}`;
 
       const title =
         (frontmatter.title as string) ||
@@ -343,11 +343,9 @@ function groupDocsBySection(docs: DocFile[], baseUrl: string): Section[] {
     const sectionId = doc.section === 'root' ? 'root' : doc.section;
 
     if (!sectionsMap.has(sectionId)) {
-      const baseUrlPart = doc.url.split('/docs/')[0] || baseUrl;
+      const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
       const sectionUrl =
-        doc.section === 'root'
-          ? `${baseUrlPart}/docs`
-          : `${baseUrlPart}/docs/${sectionId}`;
+        doc.section === 'root' ? cleanBaseUrl : `${cleanBaseUrl}/${sectionId}`;
 
       sectionsMap.set(sectionId, {
         id: sectionId,
@@ -403,7 +401,7 @@ function extractRelatedLinks(items: DocFile[]): Array<{title: string; url: strin
     let match;
     while ((match = linkRegex.exec(item.content)) !== null) {
       const url = match[2];
-      if (url.startsWith('../') || url.startsWith('./') || url.startsWith('/docs/')) {
+      if (url.startsWith('../') || url.startsWith('./') || (url.startsWith('/') && !url.startsWith('//') && !url.startsWith('http'))) {
         links.add({
           title: match[1],
           url: normalizeLink(url, item.url),
@@ -416,6 +414,10 @@ function extractRelatedLinks(items: DocFile[]): Array<{title: string; url: strin
 }
 
 function normalizeLink(link: string, currentUrl: string): string {
+  // Internal links: /docs/xxx is legacy (routeBasePath was 'docs'); now we use /xxx under baseUrl
+  if (link.startsWith('/docs/')) {
+    return '/' + link.replace(/^\/docs\/?/, '');
+  }
   if (link.startsWith('/')) {
     return link;
   }
