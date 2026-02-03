@@ -48,7 +48,6 @@ jobs:
       - name: Checkout main site repo
         uses: actions/checkout@v4
         with:
-          # Set MAIN_SITE_TOKEN secret to a PAT with write access to the main site repo
           repository: stratasite/stratasite.github.io
           token: ${{ secrets.MAIN_SITE_TOKEN }}
           path: main-site
@@ -67,8 +66,11 @@ jobs:
 
       - name: Commit and push
         working-directory: main-site
+        env:
+          GITHUB_TOKEN: ${{ secrets.MAIN_SITE_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/stratasite/stratasite.github.io.git
           git add docs/developers
           git diff --staged --quiet || (git commit -m "docs: update developer docs from developer-docs repo" && git push)
