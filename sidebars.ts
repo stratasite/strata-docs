@@ -160,11 +160,11 @@ const sidebars: SidebarsConfig = {
       id: 'troubleshooting/index',
       label: 'Troubleshooting',
     },
-    // 6. For AI Agents
+    // 6. AI Agents and Strata
     {
       type: 'doc',
-      id: 'api/llm-integration',
-      label: 'For AI Agents',
+      id: 'api/ai-agents',
+      label: 'AI Agents and Strata',
     },
   ],
 };
