@@ -12,6 +12,17 @@ A semantic layer is an abstraction that sits between your raw database tables an
 - **Performance**: Optimized query generation with cost-based routing
 - **Security**: Centralized access control and data governance
 
+:::info Git-Based Workflow
+**All semantic models are version-controlled YAML files.** Unlike UI-based BI tools where changes are made through point-and-click interfaces:
+- **Version control**: Full Git history for all changes
+- **Code review**: PR-based workflows for model changes
+- **Branching**: Test changes in branches before deploying to production
+- **CI/CD**: Automated testing and deployment pipelines
+- **Rollback**: Easy revert to any previous state
+
+This makes Strata ideal for teams that value engineering rigor and want to treat their semantic layer as code.
+:::
+
 ## Key Components
 
 ### Tables
@@ -67,6 +78,43 @@ Datasources connect Strata to your databases. They support:
 - **Multiple adapters**: PostgreSQL, Snowflake, MySQL, SQL Server, Athena, Trino, DuckDB, Druid
 - **Tier configuration**: Hot (fast), Warm (moderate), Cold (archival)
 - **Connection pooling**: Efficient query execution
+
+## Core Design Principles
+
+:::tip Unique Naming Principle — Design Philosophy
+**Field names must be unique across your entire semantic layer.** Unlike other tools (Looker, dbt, Power BI, Tableau) that use namespaced fields like `table.field_name`, Strata enforces global uniqueness.
+
+When you define a measure called "Total Revenue", that name cannot be used anywhere else in your project — not in another table, not as a dimension, nowhere.
+
+**Benefits:**
+- **Unambiguous references**: When a query asks for "Total Revenue", there's exactly one definition
+- **Simpler compound measures**: Reference fields by name without table prefixes: `[Total Revenue] - [Total Cost]`
+- **Consistent analytics**: Everyone uses the same metric definitions organization-wide
+- **AI-friendly**: LLMs can understand your model without disambiguation
+
+**Trade-offs:**
+- You cannot have `orders.revenue` and `subscriptions.revenue` — you must use distinct names like `order_revenue` and `subscription_revenue`
+- Naming becomes more important and requires upfront planning
+- Larger projects may face naming challenges as the model grows
+
+**Recommendation:** Establish naming conventions early (e.g., prefix patterns like `order_*`, `customer_*`) to avoid conflicts.
+:::
+
+:::danger No Many-to-Many Relationships
+**Strata does not support many-to-many (`many_to_many`) relationships.** This is an intentional design constraint to ensure predictable query behavior.
+
+**Why this limitation exists:**
+- Prevents double-counting in aggregations (a common source of bugs)
+- Forces explicit modeling that makes data relationships clearer
+- Ensures consistent query results
+
+**Workaround:**
+If you need many-to-many relationships (e.g., Users ↔ Roles), create a **junction/bridge table** with two separate relationships:
+- `Users → UserRoles` (one_to_many)
+- `UserRoles → Roles` (many_to_one)
+
+**Trade-off:** This requires additional YAML files and explicit modeling, but results in more maintainable and predictable semantic models.
+:::
 
 ## How It Works
 

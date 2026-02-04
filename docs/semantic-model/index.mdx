@@ -6,6 +6,61 @@ Deep dive into Strata's semantic modeling capabilities.
 
 The semantic model is the core of Strata. It transforms raw database tables into business-friendly analytics models that enable self-service analytics.
 
+## Critical Rules
+
+Before diving into components, understand these non-negotiable design principles:
+
+:::tip Unique Naming Principle — Strata's Approach
+**Every field name must be unique across your entire semantic layer.**
+
+This is a fundamental design principle (unlike tools that use namespaced fields like `table.field_name`).
+
+**Benefits:**
+- **Unambiguous references**: "Total Revenue" means exactly one thing
+- **Compound measures**: `[Total Revenue] - [Total Cost]` works without table prefixes
+- **AI integration**: LLMs can reference fields without disambiguation
+- **Consistent metrics**: Organization-wide definitions
+
+**Considerations:**
+- Requires thoughtful naming conventions from the start
+- Use prefixes or suffixes to avoid conflicts (e.g., `order_revenue`, `subscription_revenue`)
+
+```yaml
+# These cannot coexist in the same project:
+# In tbl.store_sales.yml
+- name: Total Revenue  # ✓ First definition
+
+# In tbl.catalog_sales.yml  
+- name: Total Revenue  # ✗ ERROR: Name already used
+- name: Catalog Revenue  # ✓ Use a unique name instead
+```
+:::
+
+:::danger No Many-to-Many Relationships
+**`many_to_many` cardinality is not supported.** This design constraint prevents double-counting bugs and ensures predictable aggregations.
+
+**Workaround:** Use junction tables with two separate relationships.
+
+```yaml
+# ✗ NOT SUPPORTED
+users_roles:
+  cardinality: many_to_many
+
+# ✓ USE JUNCTION TABLE
+users_user_roles:
+  left: Users
+  right: User Roles
+  cardinality: one_to_many
+
+user_roles_roles:
+  left: User Roles
+  right: Roles
+  cardinality: many_to_one
+```
+
+**Why:** This approach makes relationships explicit and prevents common aggregation errors where measures get counted multiple times.
+:::
+
 ## Key Components
 
 ### Tables
@@ -42,7 +97,7 @@ Expressions define how fields query the database:
 
 Relationships define how tables join:
 - **Cardinality**: one-to-one, one-to-many, many-to-one
-- **Join Types**: left, right, inner, full
+- **Join Types**: inner (default), left, right
 - **Join Conditions**: SQL expressions
 
 [Learn about relationships →](/semantic-model/relationships/cardinality)

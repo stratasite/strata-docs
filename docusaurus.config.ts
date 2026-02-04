@@ -71,6 +71,19 @@ const config: Config = {
       generateDocsApiPlugin,
       {},
     ],
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['en'],
+        indexDocs: true,
+        indexBlog: false,
+        docsRouteBasePath: '/',
+        highlightSearchTermsOnTargetPage: true,
+      },
+    ],
+    // Note: For production with higher traffic, consider Algolia DocSearch:
+    // Apply at https://docsearch.algolia.com/ and replace the local search plugin above
   ],
 
   themeConfig: {
@@ -93,11 +106,6 @@ const config: Config = {
           position: 'left',
           label: 'Getting Started',
         },
-        {
-          href: githubUrl,
-          label: 'GitHub',
-          position: 'right',
-        },
       ],
     },
     footer: {
@@ -119,14 +127,6 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
-    // Algolia DocSearch (critical for search; required for GitHub Pages).
-    // Apply at https://docsearch.algolia.com/ and add credentials when ready.
-    // algolia: {
-    //   appId: 'YOUR_APP_ID',
-    //   apiKey: 'YOUR_SEARCH_API_KEY',
-    //   indexName: 'strata_developers',
-    //   contextualSearch: true,
-    // },
   } satisfies Preset.ThemeConfig,
 };
 

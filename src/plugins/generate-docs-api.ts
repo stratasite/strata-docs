@@ -48,16 +48,21 @@ function generateDocsApiPlugin(
       const sections = groupDocsBySection(docs, baseUrl);
 
       const index = {
+        title: 'Strata Developer Documentation',
+        base_url: baseUrl,
         sections: sections.map((section) => ({
           id: section.id,
           title: section.title,
           url: section.url,
+          summary: extractSectionSummary(section),
+          endpoint: `/api/${section.id}.json`,
           items: section.items.map((item) => ({
             id: item.id,
             title: item.title,
             url: item.url,
           })),
         })),
+        full_markdown: '/llms.txt',
       };
 
       fs.writeFileSync(
@@ -65,16 +70,21 @@ function generateDocsApiPlugin(
         JSON.stringify(index, null, 2)
       );
 
-      // Generate section JSON files
+      // Generate section JSON files with enhanced structure
       for (const section of sections) {
         const sectionContent = {
+          id: section.id,
           title: section.title,
-          content: section.items.map((item) => item.content).join('\n\n'),
+          url: section.url,
+          summary: extractSectionSummary(section),
           pages: section.items.map((item) => ({
             id: item.id,
             title: item.title,
             url: item.url,
-            content: item.content,
+            path: item.path,
+            content_markdown: item.content,
+            frontmatter: item.frontmatter,
+            sections: extractHeadings(item.content),
           })),
           relatedLinks: extractRelatedLinks(section.items),
         };
@@ -181,8 +191,8 @@ function generateJsonSchemas(schemaDir: string) {
           right: {type: 'string', description: 'Right table name'},
           sql: {type: 'string', description: 'Join condition'},
           cardinality: {enum: ['one_to_one', 'one_to_many', 'many_to_one']},
-          join: {enum: ['left', 'right', 'inner', 'full']},
-          allow_measure_expansion: {type: 'boolean'},
+          join: {enum: ['inner', 'left', 'right'], default: 'inner'},
+          allow_measure_expansion: {type: 'boolean', default: false},
         },
       },
     },
@@ -421,6 +431,51 @@ function normalizeLink(link: string, currentUrl: string): string {
   const currentDir = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
   const resolved = path.resolve(currentDir, link).replace(/\\/g, '/');
   return resolved;
+}
+
+function extractSectionSummary(section: Section): string {
+  // Find the root index page for this section (e.g., "semantic-model/index.mdx", not "semantic-model/adapters/index.mdx")
+  const indexPage = section.items.find(
+    (item) => item.path === `${section.id}/index.mdx` || item.path === `${section.id}/index.md`
+  );
+  
+  if (indexPage) {
+    // Extract first paragraph after title as summary
+    const lines = indexPage.content.split('\n');
+    let foundTitle = false;
+    
+    for (const line of lines) {
+      if (line.match(/^#\s+/)) {
+        foundTitle = true;
+        continue;
+      }
+      
+      if (foundTitle && line.trim() && !line.startsWith('#') && !line.startsWith('```') && !line.startsWith(':::')) {
+        // Return first non-empty, non-heading, non-code-block line
+        return line.trim();
+      }
+    }
+  }
+  
+  // Fallback: use section title
+  return `${section.title} documentation`;
+}
+
+function extractHeadings(content: string): Array<{text: string; level: number}> {
+  const headings: Array<{text: string; level: number}> = [];
+  const lines = content.split('\n');
+  
+  for (const line of lines) {
+    const match = line.match(/^(#{1,6})\s+(.+)$/);
+    if (match) {
+      headings.push({
+        level: match[1].length,
+        text: match[2].trim(),
+      });
+    }
+  }
+  
+  return headings;
 }
 
 export default generateDocsApiPlugin;

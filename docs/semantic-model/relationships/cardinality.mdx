@@ -127,12 +127,91 @@ customer_orders:
   cardinality: one_to_many
 ```
 
+## Measure Expansion
+
+:::warning Understanding allow_measure_expansion
+By default, measures can only be aggregated along `one_to_one` join paths. The `allow_measure_expansion` property enables measures to aggregate along `many_to_one` or `one_to_many` paths, but **use with caution** to avoid double-counting.
+:::
+
+### The Double-Counting Problem
+
+When you join a fact table to a dimension through a `many_to_one` relationship and then to another table, measures might be counted multiple times:
+
+```
+Orders (fact) → Customer → Customer Address
+   100 rows       50 rows      50 rows
+```
+
+If you query `Total Revenue` grouped by `Address City`, each order amount could be counted once (correct) or multiple times (incorrect) depending on the join path.
+
+### Using allow_measure_expansion
+
+Set `allow_measure_expansion: true` when you're **certain** the join path won't cause double-counting:
+
+```yaml
+# Safe: Customer has exactly one address
+customer_address:
+  left: Customer
+  right: Customer Address
+  sql: left.address_id = right.id
+  cardinality: many_to_one
+  allow_measure_expansion: true  # Measures can flow through this join
+```
+
+### When to Use
+
+| Scenario | allow_measure_expansion | Why |
+|----------|------------------------|-----|
+| Fact → Dimension (standard) | Not needed | Default behavior handles this |
+| Dimension → Dimension (1:1 logical) | `true` | Safe when truly 1:1 in practice |
+| Dimension → Lookup table | `true` | Safe for simple lookups |
+| Any path that could fan out | `false` (default) | Prevents double-counting |
+
+### Example: Safe Expansion
+
+```yaml
+datasource: warehouse
+
+# Orders to Customer: standard fact-to-dimension
+orders_customer:
+  left: Orders
+  right: Customer
+  sql: left.customer_id = right.id
+  cardinality: many_to_one
+
+# Customer to Address: each customer has one address
+# Safe to expand measures through this join
+customer_address:
+  left: Customer
+  right: Customer Address
+  sql: left.address_id = right.ca_address_sk
+  cardinality: many_to_one
+  allow_measure_expansion: true
+```
+
+With this configuration, you can query `Total Revenue` by `Address City` and get correct results.
+
+### Automatic Behavior
+
+- `one_to_one` relationships: Measures always expand (bidirectional)
+- `many_to_one` without flag: Only dimensions expand, measures stop
+- `many_to_one` with `allow_measure_expansion: true`: Measures expand through
+
+## Internal Behavior Notes
+
+:::info How Strata Handles Cardinality
+- **one_to_many** is automatically converted to **many_to_one** internally (direction flipped)
+- **one_to_one** creates bidirectional joins automatically — you can traverse either direction
+- Tables in a relationship must be in the same datasource
+:::
+
 ## Best Practices
 
 1. **Use many_to_one** for fact-to-dimension relationships
 2. **Match database relationships** - Cardinality should reflect actual data
 3. **Avoid many_to_many** - Use junction tables instead
-4. **Document relationships** - Add comments explaining relationships
+4. **Use allow_measure_expansion sparingly** - Only when you're certain it won't cause double-counting
+5. **Document relationships** - Add comments explaining why expansion is safe
 
 ## Next Steps
 

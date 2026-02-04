@@ -11,6 +11,29 @@ After completing this guide, you will be able to:
 - Check deployment status
 - Handle deployment errors
 
+## Git-Based Deployment
+
+Strata uses a **Git-based workflow** where your semantic models are YAML files in a Git repository. This enables:
+
+| Capability | Description |
+|------------|-------------|
+| Version history | Full Git history of all changes |
+| Code review | PR-based workflows before deployment |
+| Branching | Test changes safely in feature branches |
+| Rollback | Simple `git revert` to undo changes |
+| CI/CD | Integrate with GitHub Actions, GitLab CI, etc. |
+| Collaboration | Merge-based workflows with conflict resolution |
+| Audit trail | Complete Git log with commit messages |
+
+**Branch-based development workflow:**
+1. Create a feature branch for your changes
+2. Make and test modifications locally
+3. Deploy branch to staging environment
+4. Get code review from teammates
+5. Merge to main and deploy to production
+
+This treats your semantic layer as **infrastructure as code** — the same rigorous workflows used for application development.
+
 ## Prerequisites
 
 - Strata project initialized

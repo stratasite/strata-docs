@@ -107,6 +107,8 @@ const sidebars: SidebarsConfig = {
           label: 'Advanced',
           link: { type: 'doc', id: 'advanced/index' },
           items: [
+            'advanced/universe-formation',
+            'advanced/semantic-routing',
             'advanced/extended-blending-groups',
             'advanced/exclusions',
             'advanced/inclusions',
@@ -126,6 +128,7 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
+    // 4. Examples and Patterns
     {
       type: 'category',
       label: 'Examples',
@@ -151,13 +154,20 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
+    // 5. Troubleshooting
+    {
+      type: 'doc',
+      id: 'troubleshooting/index',
+      label: 'Troubleshooting',
+    },
+    // 6. API for LLMs and Integrations
     {
       type: 'category',
       label: 'API',
       link: { type: 'doc', id: 'api/index' },
       items: [
+        'api/llm-integration',
         'api/json-schema',
-        'api/openapi',
       ],
     },
   ],

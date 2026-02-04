@@ -4,52 +4,88 @@
 
 Strata is a semantic layer platform that transforms raw database tables into business-ready analytics models. This documentation covers the Strata CLI used by data engineers to define semantic models using YAML files.
 
+## Critical Concepts
+
+**Unique Naming Principle**: Field names (dimensions and measures) must be unique across the entire semantic layer. This is a core design principle that enables unambiguous field references and is a key differentiator from other BI tools.
+
+**No Many-to-Many Joins**: Strata does NOT support many-to-many relationships. Use junction/bridge tables with two separate relationships (one_to_many and many_to_one) instead.
+
+**Git-Based Workflow**: All semantic models are version-controlled YAML files. This enables branching, code review, and CI/CD workflows — a major advantage over UI-based BI tools.
+
 ## Getting Started
 - [What is Strata](/getting-started): Overview and concepts
 - [Installation](/getting-started/installation): Install Strata CLI
 - [Quickstart](/getting-started/quickstart): Create first model in 5 minutes
 - [Core Concepts](/getting-started/concepts): Understanding the semantic layer
+- [Tutorial](/getting-started/tutorial): Complete TPC-DS walkthrough
 
-## Guides
-- [Creating Tables](/guides/creating-tables): Define semantic tables
-- [Fields and Types](/guides/fields-and-types): Dimensions, measures, data types
-- [Expressions](/guides/expressions): SQL expressions, lookups, primary keys
-- [Relationships](/guides/relationships): Configure joins between tables
-- [Datasources](/semantic-model/datasources): Configure database connections and tiers
-- [Migrations](/guides/migrations): Rename and swap operations
-- [Testing](/cli/tests): Validate your semantic model
-- [Deployment](/guides/deployment): Deploy to Strata server
+## CLI Commands
+- [CLI Overview](/cli): Complete command reference
+- [Projects](/cli/projects): Initialize and link projects
+- [Datasources](/cli/datasources): Add, test, and manage database connections
+- [Tables](/cli/tables): Create semantic table models
+- [Relationships](/cli/relationships): Create join definitions
+- [Migrations](/cli/migrations): Rename and swap operations
+- [Tests](/cli/tests): Validate your semantic model
+- [Audit](/cli/audit): Run validation checks
+- [Deployment](/cli/deployment): Deploy to Strata server
 - [CI/CD](/cli/ci-cd): Automated deployment workflows
 
 ## Semantic Model
 - [Semantic Model Overview](/semantic-model): Deep dive into model capabilities
-- [Tables](/semantic-model/tables): Table model reference
-- [Dimensions](/semantic-model/fields/dimensions): Dimension fields
-- [Measures](/semantic-model/fields/measures): Measure fields
-- [Data Types](/semantic-model/fields/data-types): Supported data types
-- [SQL Expressions](/semantic-model/expressions/sql): SQL expression syntax
-- [Relationships](/semantic-model/relationships/cardinality): Join cardinality
+- [Tables](/semantic-model/tables): Table model reference (tbl.*.yml)
+- [Datasources](/semantic-model/datasources): Configure database connections and tiers (hot/warm/cold)
+- [Fields Overview](/semantic-model/fields): Dimensions and measures
+- [Dimensions](/semantic-model/fields/dimensions): Categorical fields for grouping
+- [Measures](/semantic-model/fields/measures): Aggregatable metrics
+- [Compound Measures](/semantic-model/fields/measures/compound): Measures referencing other measures
+- [Snapshot Measures](/semantic-model/fields/measures/snapshot): Point-in-time analysis
+- [Data Types](/semantic-model/fields/data-types): string, integer, decimal, date, date_time, boolean, bigint, binary
+- [Expressions](/semantic-model/expressions/sql): SQL expressions and [Field Name] references
+- [Relationships](/semantic-model/relationships/cardinality): Join cardinality (many_to_one, one_to_many, one_to_one)
+- [Join Types](/semantic-model/relationships/join-types): inner, left, right
+- [Imports](/semantic-model/imports): Reuse field definitions across tables
+
+## Database Adapters
+- [Adapters Overview](/semantic-model/adapters): Supported databases
+- [PostgreSQL](/semantic-model/adapters/postgres)
+- [Snowflake](/semantic-model/adapters/snowflake)
+- [MySQL](/semantic-model/adapters/mysql)
+- [SQL Server](/semantic-model/adapters/sqlserver)
+- [AWS Athena](/semantic-model/adapters/athena)
+- [Trino](/semantic-model/adapters/trino)
+- [DuckDB](/semantic-model/adapters/duckdb)
+- [Apache Druid](/semantic-model/adapters/druid)
 
 ## Advanced Features
-- [Snapshot Measures](/semantic-model/fields/measures/snapshot): Beginning/ending snapshots
-- [Exclusions](/advanced/exclusions): Measure exclusions
+- [Exclusions](/advanced/exclusions): Filter-based measure exclusions
 - [Inclusions](/advanced/inclusions): Multi-level calculations
-- [Partitions](/advanced/partitions): Date partitioning
+- [Partitions](/advanced/partitions): Data availability constraints
 - [Cost Optimization](/advanced/cost-optimization): Table cost and tier routing
+- [Extended Blending](/advanced/extended-blending-groups): Blend dimensions across tables
+- [Multi-Datasource](/advanced/multi-datasource): Cross-datasource queries
 - [Temporal Decorators](/advanced/decorators/temporal): YoY, MoM comparisons
 - [Window Decorators](/advanced/decorators/window): Moving averages, ranking
-- [Multi-Datasource](/advanced/multi-datasource): Cross-datasource queries
-
-## Reference
-- [CLI Commands](/cli): Complete command reference
-- [Tables](/semantic-model/tables) and [Relationships](/semantic-model/relationships/cardinality): Model structure
-- [Adapters](/cli/adapters): Database adapter configurations
+- [Contribution Decorators](/advanced/decorators/contribution): Percentage of total
 
 ## Examples
-- [TPC-DS Tutorial](/examples/tpcds-tutorial): Full walkthrough
+- [TPC-DS Tutorial](/getting-started/tutorial): Complete hands-on walkthrough
+- [TPC-DS Deep Dive](/examples/tpcds-tutorial): Model patterns and lessons
 - [Star Schema](/examples/patterns/star-schema): Star schema modeling
+- [Snowflake Schema](/examples/patterns/snowflake-schema): Snowflake schema modeling
+- [Fact-Dimension](/examples/patterns/fact-dimension): Fact-dimension patterns
 - [Customer 360](/examples/recipes/customer-360): Customer analytics recipe
+- [Sales Analysis](/examples/recipes/sales-analysis): Sales analytics recipe
 
 ## API
-- [JSON Schema](/api/json-schema): Machine-readable schema definitions
-- [OpenAPI](/api/openapi): REST API reference
+- [API Overview](/api): Machine-readable documentation for AI agents
+- [LLM Integration](/api/llm-integration): Hierarchical JSON API for LLM navigation
+- [JSON Schema](/api/json-schema): Schema definitions for YAML validation
+
+## JSON API Endpoints (for LLMs)
+- `/api/docs.json` - Root documentation index
+- `/api/docs/cli.json` - CLI commands reference
+- `/api/docs/semantic-model.json` - Semantic model reference
+- `/api/schema/table.json` - Table YAML schema
+- `/api/schema/relation.json` - Relation YAML schema
+- `/api/cli/commands.json` - All CLI commands with flags

@@ -61,22 +61,11 @@ products_categories:
 - Less common
 - When you want all categories, even without products
 
-### full
-
-Returns all rows from both tables, NULLs for non-matching rows.
-
-```yaml
-users_profiles:
-  left: Users
-  right: User Profiles
-  join: full
-  sql: left.id = right.user_id
-  cardinality: one_to_one
-```
-
-**Use cases:**
-- Rare
-- When you want all rows from both tables
+:::note Full Outer Join Not Supported
+Strata does not support `full` (FULL OUTER) joins. If you need all rows from both tables regardless of match, consider:
+- Using two separate LEFT joins and combining results
+- Restructuring your model to avoid the need for full outer joins
+:::
 
 ## Common Patterns
 
@@ -107,8 +96,8 @@ orders_promotion:
 ## Best Practices
 
 1. **Use INNER by default** - Most relationships are required
-2. **Use LEFT for optional** - When right table may not exist
-3. **Avoid RIGHT/FULL** - Less common, can be confusing
+2. **Use LEFT for optional** - When right table may not have matches
+3. **Use RIGHT sparingly** - Less common, can be confusing
 4. **Document join types** - Add comments explaining why
 
 ## Next Steps

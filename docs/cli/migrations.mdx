@@ -17,6 +17,37 @@ Migrations track changes to your semantic model over time. They allow you to:
 - **Swap entity references** (replace one entity with another)
 - **Maintain backward compatibility** during transitions
 
+:::tip Why Migrations Matter
+When you rename a field like "Store Name" to "Store Location", saved reports and dashboards that reference "Store Name" would break. Migrations solve this by:
+
+1. **Updating references automatically** — The server updates all saved queries to use the new name
+2. **Preserving historical data** — Query history continues to work
+3. **Zero downtime** — Users don't experience broken reports
+
+Without migrations, you'd have to manually update every saved report, or users would see errors.
+:::
+
+## Deployment Stages with Migrations
+
+Understanding when migrations run during deployment:
+
+```mermaid
+flowchart LR
+    subgraph Deployment
+        A[Start] --> B[Pre-Migrations]
+        B --> C[Process Datasources]
+        C --> D[Process Tables/Fields]
+        D --> E[Process Relationships]
+        E --> F[Form Universes]
+        F --> G[Post-Migrations]
+        G --> H[Cleanup]
+        H --> I[Finished]
+    end
+```
+
+- **Pre-migrations** (renames): Run before YAML processing — the old name is updated to the new name before your model files are read
+- **Post-migrations** (swaps): Run after everything is loaded — swap references between entities that both exist
+
 ## Migration Types
 
 ### Rename Migrations
@@ -180,13 +211,27 @@ migrations/20260115004653_rename_store_name_to_store_location_name.yml
 
 Format: `YYYYMMDDHHMMSS_description.yml`
 
+## Version Tracking
+
+Each deployment creates a version record that tracks:
+- Which migrations were applied
+- What entities were added, modified, or deleted
+- Timestamp and deployment metadata
+
+This enables:
+- **Audit trail** — See who changed what and when
+- **Rollback planning** — Understand what to revert if needed
+- **Incremental deploys** — Only process changed files
+
 ## Best Practices
 
-1. **Rename on production branch** - Avoid breaking production queries
-2. **Update YAML files** - Change references in same deployment
-3. **Use pre hook for renames** - Most common pattern
-4. **Test migrations** - Verify in development first
-5. **Document changes** - Add comments explaining why
+1. **Rename on production branch** — Avoid breaking production queries
+2. **Update YAML files** — Change references in same deployment
+3. **Use pre hook for renames** — Most common pattern
+4. **Test migrations** — Verify in development first
+5. **Document changes** — Add comments explaining why
+6. **One migration per change** — Don't combine unrelated renames
+7. **Coordinate with team** — Communicate before renaming widely-used fields
 
 ## Troubleshooting
 
