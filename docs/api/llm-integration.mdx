@@ -1,222 +1,192 @@
-# LLM Integration API
+# Using AI with Strata
 
-Machine-readable documentation API designed for AI agents and LLM-powered tools.
+How to use AI coding assistants to build semantic models with Strata.
 
-## Overview
+:::tip Key Point
+**Strata does not require custom prompts or fine-tuning.**
+Any modern AI coding agent (Cursor, Claude, GitHub Copilot, ChatGPT) can work with Strata by loading its official documentation.
+:::
 
-The Strata Documentation API provides JSON endpoints for LLMs to efficiently discover and access documentation content. The API serves the **actual MDX documentation content** in JSON format - not manually maintained summaries.
+## What AI-First Means
 
-**Key advantage:** Single source of truth. The JSON API is auto-generated from the same MDX files humans read, so it's always in sync.
+Strata is designed to be AI-first. This means:
 
-## How It Works
+- AI agents can **understand** Strata's semantic modeling concepts
+- AI agents can **generate** valid YAML configuration files
+- AI agents can **follow** Strata's modeling rules and constraints
+- No special prompts, private instructions, or fine-tuning required
 
-```
-1. LLM hits /api/docs.json (root index)
-2. Gets overview + links to sections
-3. Picks relevant section (e.g., /api/semantic-model.json)
-4. Receives full markdown content from all pages in that section
-5. Can navigate to specific pages as needed
-```
+When you work with an AI assistant on Strata projects, the AI isn't guessing — it's following documented rules and validated schemas.
 
-This is **context-efficient** — LLMs fetch only the sections they need.
+---
 
-## API Endpoints
+## How AI Agents Understand Strata
 
-### Root Index
+Strata provides three machine-readable artifacts that AI agents use:
 
-```
-GET /api/docs.json
-```
+### 1. Canonical Documentation
 
-Returns documentation structure with critical rules and links to all sections.
+Strata maintains a single, authoritative documentation export designed specifically for AI agents.
 
-**Response includes:**
-- `title`, `version`, `summary`
-- `critical_rules` — Key constraints (unique naming, no many-to-many, etc.)
-- `sections` — Array of documentation sections with summaries and endpoints
-- `full_markdown` — Link to `/llms.txt` for complete docs in one file
+- Contains all concepts, rules, and constraints
+- Includes canonical YAML examples for every file type
+- Lists common mistakes to avoid
+- Self-contained — AI loads it once and has complete context
 
-### Section Endpoints
+### 2. Discovery Index
 
-Each section returns all pages in that section with full markdown content:
+A machine-readable registry that helps AI agents understand what Strata can do.
 
-```
-GET /api/getting-started.json    # Installation, concepts, tutorial
-GET /api/cli.json                # All CLI command docs
-GET /api/semantic-model.json     # Tables, fields, relationships
-GET /api/advanced.json           # Universe formation, routing, etc.
-GET /api/examples.json           # Patterns and recipes
-GET /api/troubleshooting.json   # Common issues and solutions
-```
+- Lists all semantic object types (tables, relations, etc.)
+- Maps each type to its validation schema
+- Documents available CLI commands
+- Summarizes critical constraints
 
-**Each section response includes:**
+### 3. Validation Schemas
 
-```json
-{
-  "id": "semantic-model",
-  "title": "Semantic Model",
-  "url": "/developer-docs/semantic-model",
-  "summary": "Tables, fields, relationships, expressions",
-  "pages": [
-    {
-      "id": "tables",
-      "title": "Tables",
-      "url": "/developer-docs/semantic-model/tables",
-      "path": "semantic-model/tables.mdx",
-      "content_markdown": "# Tables\n\nDefine semantic metadata...\n\n[full MDX content]",
-      "frontmatter": {},
-      "sections": [
-        {"level": 1, "text": "Tables"},
-        {"level": 2, "text": "Overview"},
-        {"level": 2, "text": "Required Fields"}
-      ]
-    }
-  ],
-  "relatedLinks": [...]
-}
-```
+JSON Schema definitions for every Strata YAML file type.
 
-**Key fields:**
-- `content_markdown` — Full MDX content from the page (includes examples, warnings, code blocks)
-- `sections` — Heading structure for navigation within the page
-- `frontmatter` — Metadata from MDX file
-- `relatedLinks` — Cross-references to other pages
+- Enables YAML validation before deployment
+- Powers IDE autocomplete
+- Prevents invalid configurations
+- Defines required vs optional fields
 
-### JSON Schema Endpoints
+---
 
-Validate YAML files programmatically:
+## How to Work with AI Agents
+
+When using an AI coding assistant with Strata, we recommend explicitly telling it:
+
+1. That you are using Strata
+2. That Strata has official documentation and rules
+3. What you want to accomplish
+
+Here are copy-paste instructions you can give your AI:
+
+### Generating a New Semantic Model
 
 ```
-GET /api/schema/table.json      # Table YAML schema (tbl.*.yml)
-GET /api/schema/relation.json   # Relation YAML schema (rel.*.yml)
-GET /api/schema/project.json    # Project YAML schema (project.yml)
+We are using Strata for semantic modeling.
+Please follow Strata's official semantic modeling rules and YAML format.
+
+Generate a semantic model for the following database tables:
+- orders (order_id, customer_id, order_date, total_amount)
+- customers (customer_id, name, email, created_at)
+- products (product_id, name, category, price)
 ```
 
-**Use for:**
-- Validating generated YAML before deployment
-- Understanding required vs optional fields
-- Seeing allowed enum values (cardinality types, data types, etc.)
-
-### CLI Commands Reference
+### Working with Existing Models
 
 ```
-GET /api/cli/commands.json
+We are using Strata.
+Here is an existing semantic model. Please review it and:
+- Verify the relationship cardinalities are correct
+- Optimize the cost configuration
+- Ensure field names are unique and descriptive
+
+[paste your YAML here]
 ```
 
-Returns all CLI commands with syntax and options. Useful for LLMs helping users with command-line operations.
-
-## LLM Navigation Patterns
-
-### Pattern 1: Targeted Lookup
+### Learning Strata Concepts
 
 ```
-User: "How do I define a compound measure?"
-
-LLM:
-1. GET /api/docs.json → sees "semantic-model" section
-2. GET /api/semantic-model.json → finds "compound.mdx" page
-3. Reads content_markdown for compound measures
-4. Returns answer with examples from docs
+We are using Strata for semantic modeling.
+Please explain how relationships work in Strata, including:
+- The difference between many_to_one and one_to_many
+- How to handle many-to-many relationships
+- When to use allow_measure_expansion
 ```
 
-### Pattern 2: Broad Context
+### Schema-First Generation
 
 ```
-User: "Help me build a semantic model"
+We are using Strata.
+Please refer to Strata's documentation to understand how tables and relations are defined.
 
-LLM:
-1. GET /llms.txt → loads full documentation
-2. Has complete context for entire conversation
+Generate a valid Strata table YAML for the following database schema:
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    total_amount DECIMAL(10,2)
+);
 ```
 
-### Pattern 3: YAML Generation
+---
 
-```
-User: "Create a table for orders"
+## Recommended Workflows
 
-LLM:
-1. GET /api/schema/table.json → understands structure
-2. GET /api/semantic-model.json → finds tables page for examples
-3. Generates YAML following schema + examples
-4. Validates against schema
-```
+### Workflow A: Generate Semantic Models
 
-## Response Structure
+1. **Describe** your source database tables to the AI
+2. **Ask** the agent to generate Strata YAML following official rules
+3. **Review** the generated YAML for accuracy
+4. **Validate** with `strata audit`
+5. **Commit** and deploy
 
-All section endpoints follow this structure:
+### Workflow B: Refactor Existing Models
 
-```typescript
-{
-  id: string;              // Section identifier
-  title: string;           // Human-readable title
-  url: string;             // Web URL for this section
-  summary: string;         // Brief description
-  pages: Array<{
-    id: string;            // Page identifier
-    title: string;         // Page title
-    url: string;           // Web URL
-    path: string;          // File path (e.g., "semantic-model/tables.mdx")
-    content_markdown: string;  // Full MDX content
-    frontmatter: object;   // Metadata from MDX
-    sections: Array<{      // Heading structure
-      level: number;       // 1-6 (h1-h6)
-      text: string;        // Heading text
-    }>;
-  }>;
-  relatedLinks: Array<{
-    title: string;
-    url: string;
-  }>;
-}
-```
+1. **Provide** your existing YAML files to the AI
+2. **Ask** for specific improvements (cost optimization, relationship fixes, naming)
+3. **Review** the suggested changes
+4. **Validate** with `strata audit`
+5. **Test** before deploying to production
 
-## Best Practices for LLM Integration
+### Workflow C: Learn Strata Concepts
 
-1. **Start with /api/docs.json** — Understand available sections and critical rules
-2. **Use section endpoints** — Fetch only relevant sections (semantic-model, cli, etc.)
-3. **Parse content_markdown** — Contains full documentation with examples
-4. **Check sections array** — Navigate to specific headings within pages
-5. **Validate with schemas** — Use `/api/schema/*.json` to validate generated YAML
-6. **Cache responses** — Documentation doesn't change frequently
+1. **Ask** conceptual questions about semantic modeling
+2. **Request** examples for specific patterns
+3. **Iterate** on your understanding
+4. **Apply** what you learn to your models
 
-## Markdown Export
+---
 
-For full documentation in a single file:
+## What NOT to Do
 
-```
-GET /llms.txt
-```
+To get the best results from AI assistance, avoid these common mistakes:
 
-Returns complete documentation index in markdown format. Best for:
-- Initial context loading
-- LLMs with large context windows (100K+ tokens)
-- When you need everything upfront
+### Do NOT invent YAML keys
+Strata has a defined schema. Don't let AI create fields like `custom_aggregation` or `special_join` that don't exist.
 
-## MCP Server Integration
+### Do NOT assume SQL = semantic model
+A SQL query is not a semantic model. Semantic models define reusable dimensions and measures, not ad-hoc queries.
 
-For tool-based LLM access (Claude, ChatGPT with tools):
+### Do NOT create many_to_many relationships
+Strata does not support `many_to_many` cardinality. Use junction tables with two separate relationships instead.
 
-```json
-{
-  "mcpServers": {
-    "strata-docs": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-fetch"],
-      "env": {
-        "STRATA_DOCS_API": "https://developers.strata.site/api"
-      }
-    }
-  }
-}
-```
+### Do NOT skip validation
+Always run `strata audit` before deploying. AI-generated YAML should pass validation.
 
-This allows LLMs to use tools like:
-- `fetch_docs(section)` — Get documentation section
-- `fetch_schema(type)` — Get YAML schema
-- `search_docs(query)` — Find relevant pages
+### Do NOT duplicate field names
+Field names must be unique across your entire semantic layer. If AI creates duplicate names, ask it to make them unique.
 
-## Next Steps
+### Do NOT bypass the rules
+If AI suggests something that conflicts with Strata's rules, the rules win. Ask AI to find a compliant approach.
 
-- [JSON Schema Reference](/api/json-schema) — Schema definitions
-- [CLI Commands](/cli) — Full command reference
-- [Semantic Model](/semantic-model) — Model documentation
+---
+
+## Where AI Documentation Lives
+
+For tool builders and advanced users, here's where the machine-readable artifacts are located:
+
+| Artifact | URL | Purpose |
+|----------|-----|---------|
+| Full Documentation | `/llms.txt` | Complete knowledge for AI agents |
+| Discovery Index | `/api/docs.json` | Schema registry and CLI commands |
+| Validation Schemas | `/api/schema/*.json` | YAML structure validation |
+
+**Note:** This page explains how to use AI with Strata. The artifacts above are what AI agents actually consume.
+
+---
+
+## Summary
+
+Working with AI on Strata projects is straightforward:
+
+1. **Tell** your AI you're using Strata
+2. **Describe** what you want to build
+3. **Review** the generated YAML
+4. **Validate** with `strata audit`
+5. **Deploy** with confidence
+
+Strata's AI-first design means you don't need prompt engineering tricks. Just clear instructions and validation.

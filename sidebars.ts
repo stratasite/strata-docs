@@ -160,15 +160,11 @@ const sidebars: SidebarsConfig = {
       id: 'troubleshooting/index',
       label: 'Troubleshooting',
     },
-    // 6. API for LLMs and Integrations
+    // 6. For AI Agents
     {
-      type: 'category',
-      label: 'API',
-      link: { type: 'doc', id: 'api/index' },
-      items: [
-        'api/llm-integration',
-        'api/json-schema',
-      ],
+      type: 'doc',
+      id: 'api/llm-integration',
+      label: 'For AI Agents',
     },
   ],
 };
