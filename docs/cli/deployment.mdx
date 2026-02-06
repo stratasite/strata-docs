@@ -232,6 +232,14 @@ environments:
 - Fix errors in model files
 - Retry deployment
 
+### Deploy Job Breaks Mid-Run
+
+If the deployment fails partway through for any reason (transient error, server issue, network blip, or anything else), the deployment is marked as **failed** and the error is recorded. You will see this immediately when checking status (e.g. `strata deploy status` or in the Strata web app).
+
+**What happens:** The server updates the deployment record to `failed` and stores the error message. The branch is left in a failed state until the next deployment runs. There is no partial or stuck state that blocks retries.
+
+**Solution:** Run `strata deploy` again. The next deployment runs from scratch as a new deployment. Retrying deploy is safe and is the way to recover from a failed run—no manual cleanup is required.
+
 ### Tests Fail
 
 **Check:**
